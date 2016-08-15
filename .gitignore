@@ -1,0 +1,3 @@
+# ignore generated pdfs
+src/*.pdf
+src/Figs/*.pdf
