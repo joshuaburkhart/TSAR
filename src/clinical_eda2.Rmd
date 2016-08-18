@@ -1,0 +1,673 @@
+---
+title: "TSAR: Clinical EDA 2"
+author: "Joshua Burkhart"
+date: "August 18, 2016"
+output: 
+  pdf_document: 
+    fig_width: 9
+    fig_height: 6
+    latex_engine: xelatex
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE,
+                      results='hide', # markup marks up the results; asis return texts as-is; hide hides the results
+                      comment=NA,
+                      message=FALSE,
+                      warning=FALSE,
+                      error=FALSE,
+                      fig.path="Figs/"
+                      )
+```
+
+```{r libs, echo=FALSE, include=FALSE}
+library(magrittr)
+library(ggplot2)
+library(dplyr)
+library(memisc)
+library(pander)
+```
+
+```{r globals}
+# Assume working directory matches source file location
+# R Studio: Session->Set Working Directory->To Source File Location
+#setwd("/media/burkhart/Media/Software/TSAR/src")
+DATA_DIR <- "/media/burkhart/D052-7853/McWeeney/TSAR/"
+TRAIN_SYMPTOM <- paste(DATA_DIR,"ViralChallenge_training_SymptomScoresByDay.tsv",sep="")
+TRAIN_CLINICL <- paste(DATA_DIR,"ViralChallenge_training_CLINICAL.tsv",sep="")
+PHAS1_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase1_CLINICAL.tsv",sep="")
+PHAS2_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase2_CLINICAL.tsv",sep="")
+PHAS3_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase3_CLINICAL.tsv",sep="")
+```
+  
+```{r misc_options}
+panderOptions('table.alignment.default', function(df) ifelse(sapply(df, is.numeric), 'right', 'left'))
+```
+  
+```{r helper_functions}
+# see http://stackoverflow.com/questions/33524669/labeling-outliers-of-boxplots-in-r
+is_outlier <- function(x) {
+  return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x >= quantile(x, 0.75) + 1.5 * IQR(x))
+}
+
+add_virus_col <- function(x){
+  x %>%
+  dplyr::mutate(VIRUS = 
+                  ifelse(grepl(" H1N1$",STUDYID) %>% as.character(),"H1N1",
+                  ifelse(grepl(" H3N2$",STUDYID) %>% as.character(),"H3N2",
+                  ifelse(grepl(" RSV$",STUDYID) %>% as.character(),"RSV",
+                  ifelse(grepl("^Rhinovirus ",STUDYID) %>% as.character(),"Rhinovirus",
+                  NA))))) %>%
+    dplyr::mutate(VIRUS = VIRUS %>% as.factor()) %>%
+  return()
+}
+
+age_by_study <- function(x,label){
+  x %>%
+  dplyr::group_by(STUDYID) %>%
+  dplyr::mutate(outlier = ifelse(is_outlier(AGE), AGE, as.numeric(NA))) %>%
+  ggplot(aes(x = STUDYID, y = AGE)) +
+  geom_boxplot() +
+  geom_text(aes(label = AGE), na.rm = TRUE, hjust = -.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Study ID",
+       y="Patient Age",
+       title=paste("Patient Age Distribution by Study ID:\n",
+       label," Data",sep=""))
+}
+
+age_by_virus <- function(x,label){
+  x %>%
+  dplyr::group_by(VIRUS) %>%
+  dplyr::mutate(outlier = ifelse(is_outlier(AGE), AGE, as.numeric(NA))) %>%
+  ggplot(aes(x = VIRUS, y = AGE)) +
+  geom_boxplot() +
+  geom_text(aes(label = AGE), na.rm = TRUE, hjust = -.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Virus",
+       y="Patient Age",
+       title=paste("Patient Age Distribution by Virus:\n",
+       label," Data",sep=""))
+}
+
+log_symptom_score_by_study <- function(x,label){
+  x %>%
+  dplyr::group_by(STUDYID) %>%
+  dplyr::mutate(outlier = ifelse(is_outlier(LOGSYMPTSCORE_SC3), LOGSYMPTSCORE_SC3, as.numeric(NA))) %>%
+  ggplot(aes(x = STUDYID, y = LOGSYMPTSCORE_SC3)) +
+  geom_boxplot() +
+  geom_text(aes(label = outlier), na.rm = TRUE, hjust = -.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Study ID",
+       y="Patient Log Symptom Score",
+       title=paste("Patient Log Symptom Score Distribution by Study ID:\n",
+       label," Data",sep=""))
+}
+
+log_symptom_score_by_virus <- function(x,label){
+  x %>%
+  dplyr::group_by(VIRUS) %>%
+  dplyr::mutate(outlier = ifelse(is_outlier(LOGSYMPTSCORE_SC3), LOGSYMPTSCORE_SC3, as.numeric(NA))) %>%
+  ggplot(aes(x = VIRUS, y = LOGSYMPTSCORE_SC3)) +
+  geom_boxplot() +
+  geom_text(aes(label = outlier), na.rm = TRUE, hjust = -.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Study ID",
+       y="Patient Log Symptom Score",
+       title=paste("Patient Log Symptom Score Distribution by Virus:\n",
+       label," Data",sep=""))
+}
+
+log_symptom_score_by_timehours_by_study <- function(x,label){
+  x %>%
+    dplyr::mutate(TIMEHOURS = as.factor(TIMEHOURS)) %>%
+    dplyr::mutate(JACKSON_SCORE = 2^LOGSYMPTSCORE_SC3) %>%
+    dplyr::mutate(outlier = ifelse(is_outlier(JACKSON_SCORE), JACKSON_SCORE, as.numeric(NA))) %>%
+    dplyr::arrange(TIMEHOURS) %>%
+  ggplot(aes(x = TIMEHOURS, y = JACKSON_SCORE)) +
+  geom_boxplot() +
+  geom_text(aes(label = outlier), na.rm = TRUE, hjust = -.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Study ID",
+       y="Patient Jackson Score",
+       title=paste("Patient Jackson Score Distribution by Study ID:\n",
+       label," Data",sep="")) +
+    facet_wrap(~STUDYID)
+}
+
+log_symptom_score_by_timehours_by_virus <- function(x,label){
+  x %>%
+    dplyr::mutate(TIMEHOURS = as.factor(TIMEHOURS)) %>%
+        dplyr::mutate(JACKSON_SCORE = 2^LOGSYMPTSCORE_SC3) %>%
+    dplyr::mutate(outlier = ifelse(is_outlier(JACKSON_SCORE), JACKSON_SCORE, as.numeric(NA))) %>%
+    dplyr::arrange(TIMEHOURS) %>% 
+  ggplot(aes(x = TIMEHOURS, y = JACKSON_SCORE)) +
+  geom_boxplot() +
+  geom_text(aes(label = outlier), na.rm = TRUE, hjust = -.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Study ID",
+       y="Patient Jackson Score",
+       title=paste("Patient Jackson Score Distribution by Virus:\n",
+       label," Data",sep="")) +
+    facet_wrap(~VIRUS)
+}
+
+symptom_score_by_studyday_by_study <- function(x,label){
+  x %>%
+    dplyr::mutate(STUDYDAY = as.factor(STUDYDAY)) %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(SUM_SCORE = sum(SX_HEADACHE,
+                                  SX_RUNNYNOSE,
+                                  SX_COUGH,
+                                  SX_MALAISE,
+                                  SX_MYALGIA,
+                                  SX_SNEEZE,
+                                  SX_SORETHROAT,
+                                  SX_STUFFYNOSE)) %>%
+    dplyr::mutate(outlier = ifelse(is_outlier(SUM_SCORE), SUM_SCORE, as.numeric(NA))) %>%
+    dplyr::arrange(STUDYDAY) %>%
+  ggplot(aes(x = STUDYDAY, y = SUM_SCORE)) +
+  geom_boxplot() +
+  geom_text(aes(label = outlier), na.rm = TRUE, hjust = -.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Study ID",
+       y="Patient Symptom Score Sum",
+       title=paste("Patient Symptom Score Sum Distribution by Study ID:\n",
+       label," Data",sep="")) +
+    facet_wrap(~STUDYID)
+}
+
+symptom_score_by_studyday_by_virus <- function(x,label){
+  x %>%
+    dplyr::mutate(STUDYDAY = as.factor(STUDYDAY)) %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(SUM_SCORE = sum(SX_HEADACHE,
+                                  SX_RUNNYNOSE,
+                                  SX_COUGH,
+                                  SX_MALAISE,
+                                  SX_MYALGIA,
+                                  SX_SNEEZE,
+                                  SX_SORETHROAT,
+                                  SX_STUFFYNOSE)) %>%
+    dplyr::mutate(outlier = ifelse(is_outlier(SUM_SCORE), SUM_SCORE, as.numeric(NA))) %>%
+    dplyr::arrange(STUDYDAY) %>%
+  ggplot(aes(x = STUDYDAY, y = SUM_SCORE)) +
+  geom_boxplot() +
+  geom_text(aes(label = outlier), na.rm = TRUE, hjust = -.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Study ID",
+       y="Patient Symptom Score Sum",
+       title=paste("Patient Symptom Score Sum Distribution by Virus:\n",
+       label," Data",sep="")) +
+    facet_wrap(~VIRUS)
+}
+```
+  
+```{r loading_data}
+train_symptom_df <- read.table(TRAIN_SYMPTOM,header=T,sep="\t")
+train_clinicl_df <- read.table(TRAIN_CLINICL,header=T,sep="\t")
+phas1_clinicl_df <- read.table(PHAS1_CLINICL,header=T,sep="\t")
+phas2_clinicl_df <- read.table(PHAS2_CLINICL,header=T,sep="\t")
+phas3_clinicl_df <- read.table(PHAS3_CLINICL,header=T,sep="\t")
+```
+
+### Scan for Missing Data...
+
+```{r scanning_for_missing_data}
+sum(is.na(train_symptom_df)) #0
+sum(is.na(train_clinicl_df)) #4318
+sum(is.na(phas1_clinicl_df)) #60
+sum(is.na(phas2_clinicl_df)) #88
+sum(is.na(phas3_clinicl_df)) #62
+```
+
+### Fix Missing Data...
+
+```{r fix_missing_training_clinical_data}
+#### Training Clinical Data
+train_clinicl_df %>% str()
+train_clinicl_df %>% summary()
+train_clinicl_df <- train_clinicl_df %>%
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+train_clinicl_df <- train_clinicl_df %>% 
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+```
+
+```{r fix_missing_phase1_clinical_data}
+#### Phase 1 Clinical Data
+phas1_clinicl_df %>% str()
+phas1_clinicl_df <- phas1_clinicl_df %>% 
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+phas1_clinicl_df <- phas1_clinicl_df %>% 
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+```
+
+```{r fix_missing_phase2_clinical_data}
+#### Phase 2 Clinical Data
+phas2_clinicl_df %>% str()
+phas2_clinicl_df <- phas2_clinicl_df %>%
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+phas2_clinicl_df <- phas2_clinicl_df %>%
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+```
+
+```{r fix_missing_phase3_clinical_data}
+#### Phase 3 Clinical Data
+phas3_clinicl_df %>% str()
+phas3_clinicl_df <- phas3_clinicl_df %>%
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+phas3_clinicl_df <- phas3_clinicl_df %>% 
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+```
+
+### Find max/median log symptom score by time hours with study & virus summarizations
+
+```{r lss_timehours_summary, echo=TRUE, results='asis'}
+train_clinicl_df %>%
+  dplyr::group_by(STUDYID) %>%
+  dplyr::mutate(JACKSON_SCORE = 2^LOGSYMPTSCORE_SC3) %>%
+  dplyr::summarise(jackson_mean=mean(JACKSON_SCORE),
+                  jackson_med=median(JACKSON_SCORE),
+                  log_mean=mean(LOGSYMPTSCORE_SC3),
+                  log_med=median(LOGSYMPTSCORE_SC3)) %>%
+  pander(split.cells = 50, split.table = Inf)
+
+train_clinicl_df %>%
+  dplyr::group_by(STUDYID,TIMEHOURS) %>%
+  dplyr::mutate(JACKSON_SCORE = 2^LOGSYMPTSCORE_SC3) %>%
+  dplyr::summarise(jackson_mean=mean(JACKSON_SCORE),
+                  jackson_med=median(JACKSON_SCORE),
+                  log_mean=mean(LOGSYMPTSCORE_SC3),
+                  log_med=median(LOGSYMPTSCORE_SC3)) %>%
+  pander(split.cells = 50, split.table = Inf)
+
+train_clinicl_df %>%
+  add_virus_col() %>%
+  dplyr::group_by(VIRUS) %>%
+  dplyr::mutate(JACKSON_SCORE = 2^LOGSYMPTSCORE_SC3) %>%
+  dplyr::summarise(jackson_mean=mean(JACKSON_SCORE),
+                  jackson_med=median(JACKSON_SCORE),
+                  log_mean=mean(LOGSYMPTSCORE_SC3),
+                  log_med=median(LOGSYMPTSCORE_SC3)) %>%
+  pander(split.cells = 50, split.table = Inf)
+
+train_clinicl_df %>%
+  add_virus_col() %>%
+  dplyr::group_by(VIRUS,TIMEHOURS) %>%
+  dplyr::mutate(JACKSON_SCORE = 2^LOGSYMPTSCORE_SC3) %>%
+  dplyr::summarise(jackson_mean=mean(JACKSON_SCORE),
+                  jackson_med=median(JACKSON_SCORE),
+                  log_mean=mean(LOGSYMPTSCORE_SC3),
+                  log_med=median(LOGSYMPTSCORE_SC3)) %>%
+  pander(split.cells = 50, split.table = Inf)
+
+z <- train_symptom_df %>% 
+  dplyr::group_by(STUDYID) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(SUM_SCORE = sum(SX_HEADACHE,
+                                  SX_RUNNYNOSE,
+                                  SX_COUGH,
+                                  SX_MALAISE,
+                                  SX_MYALGIA,
+                                  SX_SNEEZE,
+                                  SX_SORETHROAT,
+                                  SX_STUFFYNOSE))
+z %>% dplyr::ungroup() %>% dplyr::group_by(STUDYID) %>%
+  dplyr::summarise(score_mean=mean(SUM_SCORE),
+                   score_med=median(SUM_SCORE)) %>%
+  pander(split.cells = 50, split.table = Inf)
+
+z <- train_symptom_df %>% 
+  dplyr::mutate(STUDYDAY = as.factor(STUDYDAY)) %>%
+  dplyr::group_by(STUDYID,STUDYDAY) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(SUM_SCORE = sum(SX_HEADACHE,
+                                  SX_RUNNYNOSE,
+                                  SX_COUGH,
+                                  SX_MALAISE,
+                                  SX_MYALGIA,
+                                  SX_SNEEZE,
+                                  SX_SORETHROAT,
+                                  SX_STUFFYNOSE))
+z %>% dplyr::ungroup() %>% dplyr::group_by(STUDYID,STUDYDAY) %>%
+  dplyr::summarise(score_mean=mean(SUM_SCORE),
+                   score_med=median(SUM_SCORE)) %>%
+  pander(split.cells = 50, split.table = Inf)
+
+z <- train_symptom_df %>% 
+  add_virus_col() %>%
+  dplyr::group_by(VIRUS) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(SUM_SCORE = sum(SX_HEADACHE,
+                                  SX_RUNNYNOSE,
+                                  SX_COUGH,
+                                  SX_MALAISE,
+                                  SX_MYALGIA,
+                                  SX_SNEEZE,
+                                  SX_SORETHROAT,
+                                  SX_STUFFYNOSE))
+z %>% dplyr::ungroup() %>% dplyr::group_by(VIRUS) %>%
+  dplyr::summarise(score_mean=mean(SUM_SCORE),
+                   score_med=median(SUM_SCORE)) %>%
+  pander(split.cells = 50, split.table = Inf)
+
+z<- train_symptom_df %>% 
+  add_virus_col() %>%
+  dplyr::mutate(STUDYDAY = as.factor(STUDYDAY)) %>%
+  dplyr::group_by(VIRUS,STUDYDAY) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(SUM_SCORE = sum(SX_HEADACHE,
+                                  SX_RUNNYNOSE,
+                                  SX_COUGH,
+                                  SX_MALAISE,
+                                  SX_MYALGIA,
+                                  SX_SNEEZE,
+                                  SX_SORETHROAT,
+                                  SX_STUFFYNOSE))
+z %>% dplyr::ungroup() %>% dplyr::group_by(VIRUS,STUDYDAY) %>%
+  dplyr::summarise(score_mean=mean(SUM_SCORE),
+                   score_med=median(SUM_SCORE)) %>%
+  pander(split.cells = 50, split.table = Inf)
+```
+
+```{r lss_time-day_distributions}
+# train
+
+train_clinicl_df %>%
+  log_symptom_score_by_study("Train")
+train_clinicl_df %>%
+  add_virus_col() %>%
+  log_symptom_score_by_virus("Train")
+
+train_clinicl_df %>%
+  log_symptom_score_by_timehours_by_study("Train")
+train_clinicl_df %>%
+  add_virus_col() %>%
+  log_symptom_score_by_timehours_by_virus("Train")
+
+train_symptom_df %>%
+  symptom_score_by_studyday_by_study("Train")
+train_symptom_df %>%
+  add_virus_col() %>%
+  symptom_score_by_studyday_by_virus("Train")
+```
+
+### Ensure all patients are between 15-60 yo
+
+```{r age_summaries, echo=TRUE, results='asis'}
+train_clinicl_df$AGE %>% summary()
+phas1_clinicl_df$AGE %>% summary()
+phas2_clinicl_df$AGE %>% summary()
+phas3_clinicl_df$AGE %>% summary()
+```
+
+```{r age_distributions}
+# train
+
+train_clinicl_df %>%
+  age_by_study("Train")
+train_clinicl_df %>%
+  add_virus_col() %>%
+  age_by_virus("Train")
+
+# phase 1 (0h)
+
+phas1_clinicl_df %>%
+  age_by_study("Phase 1 (0h)")
+phas1_clinicl_df %>%
+  add_virus_col() %>%
+  age_by_virus("Phase 1 (0h)")
+
+# phase 2
+
+phas2_clinicl_df %>%
+  age_by_study("Phase 2")
+phas2_clinicl_df %>%
+  add_virus_col() %>%
+  age_by_virus("Phase 2")
+
+# phase 3
+
+phas3_clinicl_df %>%
+  age_by_study("Phase 3")
+phas3_clinicl_df %>%
+  add_virus_col() %>%
+  age_by_virus("Phase 3")
+
+# 24 hour
+
+phas2_clinicl_df %>%
+  rbind(phas3_clinicl_df) %>%
+  age_by_study("24h")
+phas2_clinicl_df %>%
+  rbind(phas3_clinicl_df) %>%
+  add_virus_col() %>%
+  age_by_virus("24h")
+```
+
+### Look at removing patients who report pre-challenge symptoms
+
+```{r patients_with_pre-challenge_symptoms, echo=TRUE, results='asis'}
+train_clinicl_df %>%
+  dplyr::distinct(STUDYID,SUBJECTID) %>% dim()
+train_clinicl_df %>%
+  dplyr::filter(TIMEHOURS <= 0, LOGSYMPTSCORE_SC3 > 0) %>%
+  dplyr::distinct(STUDYID,SUBJECTID) %>% dim()
+
+train_symptom_df %>%
+  dplyr::distinct(STUDYID,SUBJECTID) %>% dim()
+train_symptom_df %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(SUM_SCORE = sum(SX_HEADACHE,
+                                  SX_RUNNYNOSE,
+                                  SX_COUGH,
+                                  SX_MALAISE,
+                                  SX_MYALGIA,
+                                  SX_SNEEZE,
+                                  SX_SORETHROAT,
+                                  SX_STUFFYNOSE)) %>%
+  dplyr::filter(STUDYDAY <= 0,SUM_SCORE > 0) %>%
+  dplyr::distinct(STUDYID,SUBJECTID) %>% dim()
+```
+
+### Could we use pre-challenge unreported symptoms as predictors?
+
+```{r assess_pre-challenge_symptoms}
+z <- train_symptom_df %>% add_virus_col()
+z <- reshape2::melt(z[,c('STUDYDAY', 'STUDYID', 'VIRUS',
+                               'SX_RUNNYNOSE',
+                               'SX_COUGH',
+                               'SX_HEADACHE',
+                               'SX_MALAISE',
+                               'SX_MYALGIA',
+                               'SX_SNEEZE',
+                               'SX_SORETHROAT',
+                               'SX_STUFFYNOSE')],
+                               id.vars = c('STUDYDAY','STUDYID','VIRUS'))
+z %>%  
+dplyr::filter(STUDYDAY <= 0,value > 0) %>%
+dplyr::arrange(variable) %>%
+  ggplot(aes(x = variable,fill=variable)) + 
+  geom_bar(stat="count") +
+  labs(x="Symptom",
+       y="Pre-Challenge Symptom Counts",
+       title="Pre-Challenge Symptom Counts\n
+       by Study ID") +
+  geom_text(stat="count",aes(label=..count..),vjust=-.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_wrap(~STUDYID)
+
+z %>%  
+dplyr::filter(STUDYDAY <= 0,value > 0) %>%
+dplyr::arrange(variable) %>%
+  ggplot(aes(x = variable,fill=variable)) + 
+  geom_bar(stat="count") +
+  labs(x="Symptom",
+       y="Pre-Challenge Symptom Counts",
+       title="Pre-Challenge Symptom Counts\n
+       by Virus") +
+  geom_text(stat="count",aes(label=..count..),vjust=-.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_wrap(~VIRUS)
+
+z %>%  
+dplyr::filter(STUDYDAY > 0,value > 0) %>%
+dplyr::arrange(variable) %>%
+  ggplot(aes(x = variable,fill=variable)) + 
+  geom_bar(stat="count") +
+  labs(x="Symptom",
+       y="Post-Challenge Symptom Counts",
+       title="Post-Challenge Symptom Counts\n
+       by Study ID") +
+  geom_text(stat="count",aes(label=..count..),vjust=-.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_wrap(~STUDYID)
+
+z %>%  
+dplyr::filter(STUDYDAY > 0,value > 0) %>%
+dplyr::arrange(variable) %>%
+  ggplot(aes(x = variable,fill=variable)) + 
+  geom_bar(stat="count") +
+  labs(x="Symptom",
+       y="Post-Challenge Symptom Counts",
+       title="Post-Challenge Symptom Counts\n
+       by Virus") +
+  geom_text(stat="count",aes(label=..count..),vjust=-.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_wrap(~VIRUS)
+```
+
+### What are the distributions of pre-challenge unreported symptoms?
+
+```{r pre-challenge_unreported_distributions}
+
+#Rhinovirus: Sneeze
+train_symptom_df %>% add_virus_col() %>%
+  dplyr::filter(VIRUS=="Rhinovirus") %>%
+  dplyr::select(STUDYDAY,SX_SNEEZE) %>%
+  dplyr::arrange(SX_SNEEZE) %>%
+  ggplot(aes(x=STUDYDAY,y=SX_SNEEZE,fill=SX_SNEEZE)) +
+  geom_bar(stat="identity") +
+  labs(fill="Severity",
+       x="Study Day",
+       y="Number of Patients Reporting SX_SNEEZE (any severity)",
+       title="Rhinovirus Study Day by SX_SNEEZE Count and Severity")
+  
+#H1N1: Cough
+train_symptom_df %>% add_virus_col() %>%
+  dplyr::filter(VIRUS=="H1N1") %>%
+  dplyr::select(STUDYDAY,SX_COUGH) %>%
+  dplyr::arrange(SX_COUGH) %>%
+  ggplot(aes(x=STUDYDAY,y=SX_COUGH,fill=SX_COUGH)) +
+  geom_bar(stat="identity") +
+  labs(fill="Severity",
+       x="Study Day",
+       y="Number of Patients Reporting SX_COUGH (any severity)",
+       title="H1N1 Study Day by SX_COUGH Count and Severity")
+
+#RSV: Cough
+train_symptom_df %>% add_virus_col() %>%
+  dplyr::filter(VIRUS=="RSV") %>%
+  dplyr::select(STUDYDAY,SX_COUGH) %>%
+  dplyr::arrange(SX_COUGH) %>%
+  ggplot(aes(x=STUDYDAY,y=SX_COUGH,fill=SX_COUGH)) +
+  geom_bar(stat="identity") +
+  labs(fill="Severity",
+       x="Study Day",
+       y="Number of Patients Reporting SX_COUGH (any severity)",
+       title="RSV Study Day by SX_COUGH Count and Severity")
+
+#RSV: Malaise
+train_symptom_df %>% add_virus_col() %>%
+  dplyr::filter(VIRUS=="RSV") %>%
+  dplyr::select(STUDYDAY,SX_MALAISE) %>%
+  dplyr::arrange(SX_MALAISE) %>%
+  ggplot(aes(x=STUDYDAY,y=SX_MALAISE,fill=SX_MALAISE)) +
+  geom_bar(stat="identity") +
+  labs(fill="Severity",
+       x="Study Day",
+       y="Number of Patients Reporting SX_MALAISE (any severity)",
+       title="RSV Study Day by SX_MALAISE Count and Severity")
+
+#RSV: Myalgia
+train_symptom_df %>% add_virus_col() %>%
+  dplyr::filter(VIRUS=="RSV") %>%
+  dplyr::select(STUDYDAY,SX_MYALGIA) %>%
+  dplyr::arrange(SX_MYALGIA) %>%
+  ggplot(aes(x=STUDYDAY,y=SX_MYALGIA,fill=SX_MYALGIA)) +
+  geom_bar(stat="identity") +
+  labs(fill="Severity",
+       x="Study Day",
+       y="Number of Patients Reporting SX_MYALGIA (any severity)",
+       title="RSV Study Day by SX_MYALGIA Count and Severity")
+
+#RSV: Sore Throat
+train_symptom_df %>% add_virus_col() %>%
+  dplyr::filter(VIRUS=="RSV") %>%
+  dplyr::select(STUDYDAY,SX_SORETHROAT) %>%
+  dplyr::arrange(SX_SORETHROAT) %>%
+  ggplot(aes(x=STUDYDAY,y=SX_SORETHROAT,fill=SX_SORETHROAT)) +
+  geom_bar(stat="identity") +
+  labs(fill="Severity",
+       x="Study Day",
+       y="Number of Patients Reporting SX_SORETHROAT (any severity)",
+       title="RSV Study Day by SX_SORETHROAT Count and Severity")
+
+```
+
+### What phenotypes (symptoms/symptom combinations) are not seen pre-challenge?
+
+> Rhinovirus: Sneeze  
+> H1N1: Cough  
+> RSV: Cough  
+> RSV: Malaise  
+> RSV: Myalgia  
+> RSV: Sore Throat  
+
+### Look at removing patients who are asymptomatic for the entire study. Could we use them as shams?
+
+```{r remove_asymptomatic_patients, echo=TRUE, results='asis'}
+z <- train_symptom_df %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(SUM_SCORE = sum(SX_HEADACHE,
+                                  SX_RUNNYNOSE,
+                                  SX_COUGH,
+                                  SX_MALAISE,
+                                  SX_MYALGIA,
+                                  SX_SNEEZE,
+                                  SX_SORETHROAT,
+                                  SX_STUFFYNOSE))
+  z <- z %>% dplyr::ungroup() %>%
+    dplyr::group_by(SUBJECTID,STUDYID) %>%
+    dplyr::select(SUBJECTID,STUDYID,SUM_SCORE) %>%
+  dplyr::summarize_each(dplyr::funs(sum)) %>%
+  dplyr::filter(SUM_SCORE == 0)
+  z %>% dim()
+  z %>%
+  pander(split.cells = 50, split.table = Inf)
+  
+  z <- train_clinicl_df %>%
+    dplyr::group_by(SUBJECTID,STUDYID) %>%
+    dplyr::select(SUBJECTID,STUDYID,LOGSYMPTSCORE_SC3) %>%
+  dplyr::summarize_each(dplyr::funs(sum)) %>%
+  dplyr::filter(LOGSYMPTSCORE_SC3 == 0)
+  z %>% dim()
+  z %>%
+  pander(split.cells = 50, split.table = Inf)
+```
+
+### Explore ID's of CEL files
+
+```{r CEL_file_names}
+train_clinicl_df %>% 
+  dplyr::mutate(CEL_num = as.numeric(CEL)) %>%
+  dplyr::arrange(CEL_num) %>%
+  ggplot(aes(x=STUDYID,y=CEL_num)) +
+  geom_point() +   
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Study ID",
+       y="CEL Filename (converted to numeric for ranking)",
+       title="CEL Filename by Study ID")
+```
+
+### Explore early TX
