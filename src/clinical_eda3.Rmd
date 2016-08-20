@@ -1,0 +1,288 @@
+---
+title: "TSAR: Clinical EDA 3"
+author: "Joshua Burkhart"
+date: "August 20, 2016"
+output: 
+  pdf_document: 
+    fig_width: 9
+    fig_height: 6
+    latex_engine: xelatex
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE,
+                      results='hide', # markup marks up the results; asis return texts as-is; hide hides the results
+                      comment=NA,
+                      message=FALSE,
+                      warning=FALSE,
+                      error=FALSE,
+                      fig.path="Figs/"
+                      )
+```
+
+```{r libs, echo=FALSE, include=FALSE}
+library(magrittr)
+library(ggplot2)
+library(dplyr)
+library(memisc)
+library(pander)
+```
+
+```{r globals}
+# Assume working directory matches source file location
+# R Studio: Session->Set Working Directory->To Source File Location
+#setwd("/media/burkhart/Media/Software/TSAR/src")
+DATA_DIR <- "/media/burkhart/D052-7853/McWeeney/TSAR/"
+TRAIN_SYMPTOM <- paste(DATA_DIR,"ViralChallenge_training_SymptomScoresByDay.tsv",sep="")
+TRAIN_CLINICL <- paste(DATA_DIR,"ViralChallenge_training_CLINICAL.tsv",sep="")
+PHAS1_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase1_CLINICAL.tsv",sep="")
+PHAS2_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase2_CLINICAL.tsv",sep="")
+PHAS3_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase3_CLINICAL.tsv",sep="")
+```
+  
+```{r misc_options}
+panderOptions('table.alignment.default', function(df) ifelse(sapply(df, is.numeric), 'right', 'left'))
+```
+  
+```{r helper_functions}
+add_virus_col <- function(x){
+  x %>%
+  dplyr::mutate(VIRUS = 
+                  ifelse(grepl(" H1N1$",STUDYID) %>% as.character(),"H1N1",
+                  ifelse(grepl(" H3N2$",STUDYID) %>% as.character(),"H3N2",
+                  ifelse(grepl(" RSV$",STUDYID) %>% as.character(),"RSV",
+                  ifelse(grepl("^Rhinovirus ",STUDYID) %>% as.character(),"Rhinovirus",
+                  NA))))) %>%
+    dplyr::mutate(VIRUS = VIRUS %>% as.factor()) %>%
+  return()
+}
+```
+  
+```{r loading_data}
+train_symptom_df <- read.table(TRAIN_SYMPTOM,header=T,sep="\t")
+train_clinicl_df <- read.table(TRAIN_CLINICL,header=T,sep="\t")
+phas1_clinicl_df <- read.table(PHAS1_CLINICL,header=T,sep="\t")
+phas2_clinicl_df <- read.table(PHAS2_CLINICL,header=T,sep="\t")
+phas3_clinicl_df <- read.table(PHAS3_CLINICL,header=T,sep="\t")
+```
+
+```{r scanning_for_missing_data}
+### Scan for Missing Data...
+sum(is.na(train_symptom_df)) #0
+sum(is.na(train_clinicl_df)) #4318
+sum(is.na(phas1_clinicl_df)) #60
+sum(is.na(phas2_clinicl_df)) #88
+sum(is.na(phas3_clinicl_df)) #62
+```
+
+```{r fix_missing_clinical_data}
+### Fix Missing Data...
+#### Training Clinical Data
+train_clinicl_df %>% str()
+train_clinicl_df %>% summary()
+train_clinicl_df <- train_clinicl_df %>%
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+train_clinicl_df <- train_clinicl_df %>% 
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+
+#### Phase 1 Clinical Data
+phas1_clinicl_df %>% str()
+phas1_clinicl_df <- phas1_clinicl_df %>% 
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+phas1_clinicl_df <- phas1_clinicl_df %>% 
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+
+#### Phase 2 Clinical Data
+phas2_clinicl_df %>% str()
+phas2_clinicl_df <- phas2_clinicl_df %>%
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+phas2_clinicl_df <- phas2_clinicl_df %>%
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+
+#### Phase 3 Clinical Data
+phas3_clinicl_df %>% str()
+phas3_clinicl_df <- phas3_clinicl_df %>%
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+phas3_clinicl_df <- phas3_clinicl_df %>% 
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+```
+
+## Shedding
+
+```{r ever_any_shedding}
+any_shedding <- train_clinicl_df %>%
+  add_virus_col() %>%
+  dplyr::group_by(VIRUS,STUDYID,SUBJECTID) %>%
+  dplyr::select(VIRUS,STUDYID,SUBJECTID,SHEDDING_SC1) %>%
+  dplyr::summarize_each(dplyr::funs(sum)) %>%
+  dplyr::mutate(SHEDDING_SC1 = SHEDDING_SC1 > 0)
+
+# Shedding
+any_shedding %>%
+  ggplot(aes(x=SHEDDING_SC1)) +
+    labs(x="Ever Experiencing Any Shedding",
+       y="Number of Subjects",
+       title="Subjects Ever Experiencing Any Shedding") +
+  geom_bar(stat="count",aes(fill=SHEDDING_SC1)) 
+
+# Shedding by study
+any_shedding %>%
+  ggplot(aes(x=SHEDDING_SC1)) +
+      labs(x="Ever Experiencing Any Shedding",
+       y="Number of Subjects",
+       title="Subjects Ever Experiencing Any Shedding") +
+  geom_bar(stat="count",aes(fill=SHEDDING_SC1))  +
+  facet_wrap(~STUDYID)
+
+# Shedding by virus
+any_shedding %>%
+  ggplot(aes(x=SHEDDING_SC1)) +
+      labs(x="Ever Experiencing Any Shedding",
+       y="Number of Subjects",
+       title="Subjects Ever Experiencing Any Shedding") +
+  geom_bar(stat="count",aes(fill=SHEDDING_SC1))  +
+  facet_wrap(~VIRUS)
+```
+
+## Shedding without Symptoms
+
+```{r no_symptoms_and_no_shedding}
+no_sr_symptoms <- train_symptom_df %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(SUM_SCORE = sum(SX_HEADACHE,
+                                  SX_RUNNYNOSE,
+                                  SX_COUGH,
+                                  SX_MALAISE,
+                                  SX_MYALGIA,
+                                  SX_SNEEZE,
+                                  SX_SORETHROAT,
+                                  SX_STUFFYNOSE))
+  no_sr_symptoms <- no_sr_symptoms %>% dplyr::ungroup() %>%
+    dplyr::group_by(SUBJECTID,STUDYID) %>%
+    dplyr::select(SUBJECTID,STUDYID,SUM_SCORE) %>%
+  dplyr::summarize_each(dplyr::funs(sum)) %>%
+  dplyr::filter(SUM_SCORE == 0)
+
+  no_logsymptscore <- train_clinicl_df %>%
+    dplyr::group_by(SUBJECTID,STUDYID) %>%
+    dplyr::select(SUBJECTID,STUDYID,LOGSYMPTSCORE_SC3,SHAM) %>%
+  dplyr::summarize_each(dplyr::funs(sum)) %>%
+  dplyr::filter(LOGSYMPTSCORE_SC3 == 0)
+  
+  no_symptoms <- no_sr_symptoms %>%
+    dplyr::inner_join(no_logsymptscore,by=c("STUDYID","SUBJECTID"))
+  
+  no_symptoms_and_any_shedding <- no_symptoms %>%
+    dplyr::inner_join(any_shedding,by=c("STUDYID","SUBJECTID"))
+  
+  # Shedding
+no_symptoms_and_any_shedding %>%
+  dplyr::mutate(SHAM = SHAM > 0) %>%
+  dplyr::filter(SHAM==FALSE) %>%
+  ggplot(aes(x=SHEDDING_SC1)) +
+        labs(x="Ever Experiencing Any Shedding",
+       y="Number of Non-Sham Subjects with No Symptoms",
+       title="Non-Sham Subjects with No Symptoms Ever Experiencing Any Shedding") +
+  geom_bar(stat="count",aes(fill=SHEDDING_SC1)) 
+
+# Shedding by study
+no_symptoms_and_any_shedding %>%
+  dplyr::mutate(SHAM = SHAM > 0) %>%
+  dplyr::filter(SHAM==FALSE) %>%
+  ggplot(aes(x=SHEDDING_SC1)) +
+          labs(x="Ever Experiencing Any Shedding",
+       y="Number of Non-Sham Subjects with No Symptoms",
+       title="Non-Sham Subjects with No Symptoms Ever Experiencing Any Shedding") +
+  geom_bar(stat="count",aes(fill=SHEDDING_SC1))  +
+  facet_wrap(~STUDYID)
+
+# Shedding by virus
+no_symptoms_and_any_shedding %>%
+  dplyr::mutate(SHAM = SHAM > 0) %>%
+  dplyr::filter(SHAM==FALSE) %>%
+  ggplot(aes(x=SHEDDING_SC1)) +
+          labs(x="Ever Experiencing Any Shedding",
+       y="Number of Non-Sham Subjects with No Symptoms",
+       title="Non-Sham Subjects with No Symptoms Ever Experiencing Any Shedding") +
+  geom_bar(stat="count",aes(fill=SHEDDING_SC1))  +
+  facet_wrap(~VIRUS)
+```
+
+
+```{r no_symptom_no_shedding_tables,echo=TRUE,results='asis'}
+no_symptoms_and_any_shedding %>%
+  dplyr::mutate(SHAM = SHAM > 0) %>%
+  dplyr::filter(SHEDDING_SC1 == FALSE, SHAM==FALSE) %>%
+  dplyr::select(VIRUS,STUDYID,SUBJECTID,SUM_SCORE,LOGSYMPTSCORE_SC3) %>%
+  dplyr::arrange(VIRUS) %>%
+  pander(split.cells = 50, split.table = Inf)
+
+no_symptoms_and_any_shedding %>%
+  dplyr::mutate(SHAM = SHAM > 0) %>%
+  dplyr::filter(SHEDDING_SC1 == FALSE, SHAM==FALSE) %>%
+  dim()
+```
+
+## LOGSYMPTSCORE_SC3 Remains Constant Per-Subject Across Time
+
+```{r log_symptom_score_by_subject_id_table, echo=TRUE,results='asis'}
+#check sd's are 0
+
+train_clinicl_df %>%
+  dplyr::group_by(SUBJECTID) %>%
+  dplyr::mutate(JACKSON_SCORE = 10^LOGSYMPTSCORE_SC3) %>%
+  dplyr::summarise(jackson_mean=mean(JACKSON_SCORE),
+                  jackson_sd=sd(JACKSON_SCORE),
+                  log_mean=mean(LOGSYMPTSCORE_SC3),
+                  log_sd=sd(LOGSYMPTSCORE_SC3)) %>%
+  dplyr::arrange(desc(jackson_sd)) %>%
+  pander(split.cells = 50, split.table = Inf)
+```
+
+```{r log_symptom_score_by_subject_id}
+#show distribution by study
+
+  train_clinicl_df %>%
+    dplyr::mutate(JACKSON_SCORE = 10^LOGSYMPTSCORE_SC3) %>%
+    transform(SUBJECTID = reorder(SUBJECTID,-JACKSON_SCORE)) %>%
+  ggplot(aes(x = SUBJECTID, y = JACKSON_SCORE)) +
+  geom_point(stat="identity") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Subject",
+       y="Subject Jackson Score",
+       title="Subject Jackson Score by Study") +
+  facet_wrap(~STUDYID,scales="free_x")
+
+    train_clinicl_df %>%
+    dplyr::mutate(JACKSON_SCORE = 10^LOGSYMPTSCORE_SC3) %>%
+  ggplot(aes(x = STUDYID, y=JACKSON_SCORE)) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        labs(x="Study",
+       y="Subject Jackson Score",
+       title="Subject Jackson Score by Study") +
+  geom_boxplot()
+  
+#show distribution by virus
+  
+    train_clinicl_df %>%
+    add_virus_col() %>%
+    dplyr::mutate(JACKSON_SCORE = 10^LOGSYMPTSCORE_SC3) %>%
+    transform(SUBJECTID = reorder(SUBJECTID,-JACKSON_SCORE)) %>%
+  ggplot(aes(x = SUBJECTID, y = JACKSON_SCORE)) +
+  geom_point(stat="identity") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Subject",
+       y="Subject Jackson Score",
+       title="Subject Jackson Score by Virus") +
+  facet_wrap(~VIRUS,scales="free_x")
+    
+    train_clinicl_df %>%
+      add_virus_col() %>%
+    dplyr::mutate(JACKSON_SCORE = 10^LOGSYMPTSCORE_SC3) %>%
+  ggplot(aes(x = VIRUS, y=JACKSON_SCORE)) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        labs(x="Study",
+       y="Subject Jackson Score",
+       title="Subject Jackson Score by Virus") +
+  geom_boxplot()
+```
