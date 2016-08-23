@@ -1,0 +1,93 @@
+---
+title: "TSAR: Expression EDA"
+author: "Joshua Burkhart"
+date: "August 23, 2016"
+output: 
+  pdf_document: 
+      latex_engine: xelatex
+---
+
+```{r knitr_chunk_options, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE,
+                      results='hide', # markup marks up the results; asis return texts as-is; hide hides the results
+                      comment=NA,
+                      message=FALSE,
+                      warning=FALSE,
+                      error=FALSE,
+                      fig.width=8,
+                      fig.align='center',
+                      fig.path="Figs/",
+                      dev="png",
+                      dev.args=list(type="cairo"),
+                      dpi=72)
+```
+
+```{r libs}
+library(knitr)
+library(magrittr)
+library(dplyr)
+library(affy)
+library(pander)
+library(ggplot2)
+library(limma)
+library(pheatmap)
+```
+
+```{r globals}
+# Assume working directory matches source file location
+# R Studio: Session->Set Working Directory->To Source File Location
+#setwd("/media/burkhart/Media/Software/TSAR/src")
+IMAGES_AS_SVG <- TRUE
+DATA_DIR <- "/Volumes/NO NAME/McWeeney/TSAR/"
+TRAIN_SYMPTOM <- paste(DATA_DIR,"ViralChallenge_training_SymptomScoresByDay.tsv",sep="")
+TRAIN_CLINICL <- paste(DATA_DIR,"ViralChallenge_training_CLINICAL.tsv",sep="")
+PHAS1_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase1_CLINICAL.tsv",sep="")
+PHAS2_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase2_CLINICAL.tsv",sep="")
+PHAS3_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase3_CLINICAL.tsv",sep="")
+TRAIN_EXPRESS <- paste(DATA_DIR,"ViralChallenge_training_EXPRESSION_RMA.tsv",sep="")
+```
+
+```{r misc_options}
+setwd(DATA_DIR) # for running from chunks
+opts_knit$set(root.dir = DATA_DIR) # for knitting
+par(mfrow=c(1,1)) # one row & one column per plot
+panderOptions('table.alignment.default', function(df) ifelse(sapply(df, is.numeric), 'right', 'left'))
+```
+
+```{r load_eset}
+rma_exprs <- as.matrix(read.table(TRAIN_EXPRESS,
+                              header=TRUE,
+                              sep="\t",
+                              row.names=1,
+                              as.is=TRUE))
+
+rma_eset <- ExpressionSet(assayData=exprs)
+```
+
+```{r filter_most_variant_genes}
+top_2000 <- rma_eset %>% 
+  limma::lmFit(design=p_design) %>%
+  limma::eBayes() %>%
+  as.data.frame() %>%
+  dplyr::add_rownames(var="probesetid") %>%
+  dplyr::top_n(2000,s2.post)
+```
+
+```{r create_pheatmap}
+if(IMAGES_AS_SVG){
+  svg(filename=paste(SRC_DIR,"affy_batch_pairwise_MAplot.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
+}
+rma_eset[top_2000$probesetid,] %>% pheatmap()
+if(IMAGES_AS_SVG){
+  dev.off()
+}
+```
+
+
+
+
+
+
