@@ -92,7 +92,7 @@ tlt0_sid_cel <- train_clinicl_df %>%
   dplyr::filter(TIMEHOURS < 0) %>%
   dplyr::select(sid,CEL)
 
-tlt0_exprs <- exprs[,tlt0_sid_cel$CEL]
+tlt0_exprs <- rma_exprs[,tlt0_sid_cel$CEL]
 
 ## rename matrix column names from CEL to sid
 colnames(tlt0_exprs)[match(tlt0_sid_cel[,1],
@@ -103,7 +103,7 @@ rma_eset <- ExpressionSet(assayData=tlt0_exprs)
 
 # filter_most_variant_genes
 top_2000 <- rma_eset %>% 
-  limma::lmFit(design=p_design) %>%
+  limma::lmFit() %>%
   limma::eBayes() %>%
   as.data.frame() %>%
   dplyr::add_rownames(var="probesetid") %>%
@@ -111,7 +111,7 @@ top_2000 <- rma_eset %>%
 
 # create_pheatmap
 if(IMAGES_AS_SVG){
-  svg(filename=paste(SRC_DIR,"affy_batch_pairwise_MAplot.svg",sep=""),
+  svg(filename="affy_batch_pairwise_MAplot.svg",
       width=15,
       height=15,
       pointsize=12)
