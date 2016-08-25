@@ -1,3 +1,6 @@
 # ignore generated pdfs
 src/*.pdf
 src/Figs/*.pdf
+
+# ignore generated svgs
+src/*.svg

@@ -13,7 +13,7 @@ library(pheatmap)
 
 # globals
 IMAGES_AS_SVG <- TRUE
-DATA_DIR <- "~/TSAR/"
+DATA_DIR <- "/media/burkhart/D052-7853/McWeeney/TSAR/"
 TRAIN_SYMPTOM <- paste(DATA_DIR,"ViralChallenge_training_SymptomScoresByDay.tsv",sep="")
 TRAIN_CLINICL <- paste(DATA_DIR,"ViralChallenge_training_CLINICAL.tsv",sep="")
 PHAS1_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase1_CLINICAL.tsv",sep="")
@@ -54,6 +54,7 @@ rma_exprs <- as.matrix(read.table(TRAIN_EXPRESS,
                                   header=TRUE,
                                   sep="\t",
                                   row.names=1,
+                                  check.names = FALSE,
                                   as.is=TRUE))
 
 # filter_CELs_of_interest
@@ -90,14 +91,14 @@ train_clinicl_df <- train_clinicl_df %>%
 ## keep only t<0 arrays 
 tlt0_sid_cel <- train_clinicl_df %>%
   dplyr::filter(TIMEHOURS < 0) %>%
+  dplyr::mutate(CEL = as.character(CEL)) %>%
   dplyr::select(sid,CEL)
 
 tlt0_exprs <- rma_exprs[,tlt0_sid_cel$CEL]
 
 ## rename matrix column names from CEL to sid
-colnames(tlt0_exprs)[match(tlt0_sid_cel[,1],
-        colnames(tlt0_exprs))] <- tlt0_sid_cel[,2][
-    match(tlt0_sid_cel[,1],colnames(tlt0_exprs))]
+colnames(tlt0_exprs)[charmatch(tlt0_sid_cel$CEL,colnames(tlt0_exprs))] <-
+  tlt0_sid_cel$sid[charmatch(tlt0_sid_cel$CEL,colnames(tlt0_exprs))]
 
 rma_eset <- ExpressionSet(assayData=tlt0_exprs)
 
@@ -111,9 +112,9 @@ top_2000 <- rma_eset %>%
 
 # create_pheatmap
 if(IMAGES_AS_SVG){
-  svg(filename="affy_batch_pairwise_MAplot.svg",
-      width=15,
-      height=15,
+  svg(filename="/home/burkhart/Software/TSAR/src/affy_batch_pairwise_MAplot.svg",
+      width=20,
+      height=20,
       pointsize=12)
 }
 rma_eset[top_2000$probesetid,] %>% pheatmap()
