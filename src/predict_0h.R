@@ -11,8 +11,7 @@ library(ggplot2)
 library(limma)
 library(pheatmap)
 library(snm)
-library(parallelSVM)
-library(doParallel)
+library(e1071)
 
 print("globals")
 IMAGES_AS_PNG <- TRUE

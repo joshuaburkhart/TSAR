@@ -11,8 +11,7 @@ library(ggplot2)
 library(limma)
 library(pheatmap)
 library(snm)
-library(parallelSVM)
-library(doParallel)
+library(e1071)
 
 print("globals")
 IMAGES_AS_PNG <- TRUE
@@ -200,22 +199,31 @@ training_data <- tlt0_exprs %>%
   dplyr::full_join(tlt0_scores,by="CEL") %>%
   dplyr::select(-CEL)
 
-tuneResult <- e1071::tune(e1071::svm, 
-                          SYMPTSCORE_SC3 ~ .,
-                          data = training_data,
-                          ranges = list(epsilon = seq(0,1,0.1), cost = 2^(2:9)),
-                          cross = 10)
-print(tuneResult)
-plot(tuneResult)
-
 #trained_svm <- parallelSVM::parallelSVM(SYMPTSCORE_SC3 ~ .,
 #                                  data = training_data,
 #                                  numberCores=ifelse(detectCores() < 7,detectCores(),7),
 #                                  cross = 10)
 
+#tuneResult <- e1071::tune(e1071::svm, 
+#                          SYMPTSCORE_SC3 ~ .,
+#                          data = training_data,
+#                          ranges = list(epsilon = seq(0,1,0.1), cost = 2^(2:9)),
+#                          cross = 10)
+#print(tuneResult)
+#plot(tuneResult) # somewhere between 0.5 and 0.7
+
+tuneResult <- e1071::tune(e1071::svm, 
+                          SYMPTSCORE_SC3 ~ .,
+                          data = training_data,
+                          ranges = list(epsilon = seq(0.5,0.7,0.01), cost = 2^(2:9)),
+                          cross = 10)
+print(tuneResult)
+plot(tuneResult)
+
 print("test SVM")
 
-predicted <- predict(trained_svm,training_data) %>% as.numeric()
+tunedModel <- tuneResult$best.model
+predicted <- predict(tunedModel,training_data) %>% as.numeric()
 error <- training_data$SYMPTSCORE_SC3 - predicted
 print(paste("RMSE:",rmse(error)))
 
