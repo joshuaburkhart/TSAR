@@ -4,3 +4,9 @@ src/Figs/*.pdf
 
 # ignore generated svgs
 src/*.svg
+
+# ignore Rdata
+src/*.rda
+
+# hidden files
+src/.*
