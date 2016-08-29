@@ -1,6 +1,6 @@
 print("TSAR: Predict 0h")
 print(" author: Joshua Burkhart")
-print(" date: August 27, 2016")
+print(" date: August 28, 2016")
 
 print("libs")
 library(knitr)
@@ -21,8 +21,6 @@ PHAS1_EXPRESS <- paste(DATA_DIR,"ViralChallenge_test_Phase1_EXPRESSION_RMA.tsv",
 
 print("misc_config")
 setwd(DATA_DIR)
-cl <- makeCluster(detectCores()) 
-registerDoParallel(cl)
 
 print("load features")
 load("/home/burkhart/Software/TSAR/src/top_2000.rda") #loads top_2000 from train_0h

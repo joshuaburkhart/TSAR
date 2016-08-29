@@ -1,6 +1,6 @@
 print("TSAR: Train 0h")
 print(" author: Joshua Burkhart")
-print(" date: August 27, 2016")
+print(" date: August 28, 2016")
 
 print("libs")
 library(knitr)
