@@ -24,9 +24,58 @@ setwd(DATA_DIR)
 cl <- makeCluster(detectCores()) 
 registerDoParallel(cl)
 
-# load features
+print("load features")
 load("/home/burkhart/Software/TSAR/src/top_2000.rda") #loads top_2000 from train_0h
 
-# load trained model
-load("/home/burkhart/Software/TSAR/src/trained_svm.rda") #loads trained_svm from train_0h
+print("load trained model")
+load("/home/burkhart/Software/TSAR/src/tunedModel.rda") #loads trained_svm from train_0h
+
+print("load phas1 clinical data")
+phas1_clinicl_df <- read.table(PHAS1_CLINICL, header = T, sep = "\t")
+
+print("load phas1 eset")
+rma_exprs <- as.matrix(
+  read.table(
+    PHAS1_EXPRESS,
+    header = TRUE,
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE,
+    as.is = TRUE
+  )
+)
+
+print("keep only t<0 arrays")
+tlt0_cel <- phas1_clinicl_df %>%
+  dplyr::filter(TIMEHOURS < 0) %>%
+  dplyr::mutate(CEL = as.character(CEL)) %>%
+  dplyr::select(CEL)
+
+tlt0_exprs <- rma_exprs[, tlt0_cel$CEL]
+
+rma_eset <- ExpressionSet(assayData = tlt0_exprs)
+
+print("keep only training features")
+tlt0_exprs <- rma_eset[top_2000$probesetid, ] %>%
+  exprs() %>%
+  as.data.frame() %>%
+  dplyr::select(match(phas1_clinicl_df %>%
+                        dplyr::filter(TIMEHOURS < 0) %>%
+                        dplyr::mutate(CEL = as.character(CEL)) %>%
+                        dplyr::select(CEL) %>% .[,1],names(.)))
+
+phas1_data <- tlt0_exprs %>%
+  t() %>%
+  as.data.frame() %>%
+  dplyr::add_rownames(var = "CEL") %>%
+  dplyr::select(-CEL)
+
+print("predict phas1 scores")
+phas1_predictions <- predict(tunedModel,phas1_data) %>% as.numeric()
+
+print("store phas1 predictions")
+write.table(phas1_predictions,
+            file="/home/burkhart/Software/TSAR/src/phas1_predictions.csv",
+            sep=",")
+
 

@@ -144,7 +144,7 @@ snmR.cad = snm(rma.data,
                bio.var,
                adj.var,
                rm.adj=TRUE,
-               num.iter=1)
+               num.iter=5)
 
 snm_eset <- snmR.cad$norm.dat %>% ExpressionSet()
   
@@ -229,4 +229,4 @@ print(paste("RMSE:",rmse(error)))
 
 print("store SVM")
 
-save(trained_svm, file="/home/burkhart/Software/TSAR/src/trained_svm.rda")
+save(tunedModel, file="/home/burkhart/Software/TSAR/src/tunedModel.rda")
