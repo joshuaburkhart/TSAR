@@ -128,7 +128,7 @@ print("snm")
 cad.bio <- train_clinicl_df %>%
   filter_24h_times() %>%
   add_tgt0_col() %>%
-  dplyr::select(CEL,TLT24)
+  dplyr::select(CEL,TGT0)
 rownames(cad.bio) <- cad.bio$CEL
 cad.bio <- cad.bio %>%
   dplyr::select(-CEL)
@@ -209,19 +209,19 @@ training_data <- tlt0_exprs %>%
 #                                  numberCores=ifelse(detectCores() < 7,detectCores(),7),
 #                                  cross = 10)
 
-tuneResult <- e1071::tune(e1071::svm, 
-                          SYMPTSCORE_SC3 ~ .,
-                          data = training_data,
-                          ranges = list(epsilon = seq(0,1,0.1), cost = 2^(2:9)),
-                          cross = 10)
-#print(tuneResult)
-#plot(tuneResult) # somewhere between 0.5 and 0.7
-
 #tuneResult <- e1071::tune(e1071::svm, 
 #                          SYMPTSCORE_SC3 ~ .,
 #                          data = training_data,
-#                          ranges = list(epsilon = seq(0.5,0.7,0.01), cost = 2^(2:9)),
+#                          ranges = list(epsilon = seq(0,1,0.1), cost = 2^(2:9)),
 #                          cross = 10)
+#print(tuneResult)
+#plot(tuneResult) # somewhere between 0.0 and 0.2
+
+tuneResult <- e1071::tune(e1071::svm, 
+                          SYMPTSCORE_SC3 ~ .,
+                          data = training_data,
+                          ranges = list(epsilon = seq(0.0,0.2,0.01), cost = 2^(2:9)),
+                          cross = 10)
 print(tuneResult)
 plot(tuneResult)
 
