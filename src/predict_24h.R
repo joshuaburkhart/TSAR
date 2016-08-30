@@ -80,9 +80,17 @@ phas3_data <- ta24_exprs %>%
 print("predict phas3 scores")
 phas3_predictions <- predict(tunedModel,phas3_data) %>% as.numeric()
 
+leaderboard_submission_24h <- data.frame(
+  LOGSYMPTSCORE_SC3 = log10(phas3_predictions)) %>%
+  cbind(phas3_clinicl_df %>%
+          filter_24h_times() %>%
+          dplyr::select(SUBJECTID),.)
+
 print("store phas3 predictions")
-write.table(phas3_predictions,
-            file="/home/burkhart/Software/TSAR/src/phas3_predictions.csv",
-            sep=",")
+write.table(leaderboard_submission_24h,
+            file="/home/burkhart/Software/TSAR/src/burkhart_24h_SC3_predictions.csv",
+            sep=",",
+            row.names=FALSE,
+            quote=FALSE)
 
 

@@ -204,6 +204,23 @@ training_data <- tlt0_exprs %>%
   dplyr::full_join(tlt0_scores,by="CEL") %>%
   dplyr::select(-CEL)
 
+# Test on non-SNM'd data
+
+test_tlt0_exprs <- rma_eset[top_2000$probesetid, ] %>%
+  exprs() %>%
+  as.data.frame() %>%
+  dplyr::select(match(train_clinicl_df %>%
+                        filter_24h_times() %>%
+                        dplyr::mutate(CEL = as.character(CEL)) %>%
+                        dplyr::select(CEL) %>% .[,1],names(.)))
+
+test_data <- test_tlt0_exprs %>%
+  t() %>%
+  as.data.frame() %>%
+  dplyr::add_rownames(var = "CEL") %>%
+  dplyr::full_join(tlt0_scores,by="CEL") %>%
+  dplyr::select(-CEL)
+
 #trained_svm <- parallelSVM::parallelSVM(SYMPTSCORE_SC3 ~ .,
 #                                  data = training_data,
 #                                  numberCores=ifelse(detectCores() < 7,detectCores(),7),
@@ -228,7 +245,7 @@ plot(tuneResult)
 print("test SVM")
 
 tunedModel <- tuneResult$best.model
-predicted <- predict(tunedModel,training_data) %>% as.numeric()
+predicted <- predict(tunedModel,test_data) %>% as.numeric()
 error <- training_data$SYMPTSCORE_SC3 - predicted
 print(paste("RMSE:",rmse(error)))
 

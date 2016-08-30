@@ -1,6 +1,9 @@
+start_time <- proc.time()
+
 print("TSAR: Train 0h")
 print(" author: Joshua Burkhart")
-print(" date: August 28, 2016")
+print(" date: August 29, 2016")
+print(paste(" begun: ",start_time))
 
 print("libs")
 library(knitr)
@@ -27,8 +30,6 @@ TRAIN_EXPRESS <-
 
 print("misc_config")
 setwd(DATA_DIR)
-cl <- makeCluster(detectCores()) 
-registerDoParallel(cl)
 
 print("helper functions")
 rmse <- function(error)
@@ -177,6 +178,8 @@ if (IMAGES_AS_PNG) {
 
 print("SVM Regression LOOCV")
 
+# Train on SNM'd data
+
 tlt0_exprs <- snm_eset[top_2000$probesetid, ] %>%
   exprs() %>%
   as.data.frame() %>%
@@ -193,6 +196,23 @@ tlt0_scores <- train_clinicl_df[match(tlt0_exprs %>%
   dplyr::select(CEL, SYMPTSCORE_SC3)
 
 training_data <- tlt0_exprs %>%
+  t() %>%
+  as.data.frame() %>%
+  dplyr::add_rownames(var = "CEL") %>%
+  dplyr::full_join(tlt0_scores,by="CEL") %>%
+  dplyr::select(-CEL)
+
+# Test on non-SNM'd data
+
+test_tlt0_exprs <- rma_eset[top_2000$probesetid, ] %>%
+  exprs() %>%
+  as.data.frame() %>%
+  dplyr::select(match(train_clinicl_df %>%
+                        dplyr::filter(TIMEHOURS < 0) %>%
+                        dplyr::mutate(CEL = as.character(CEL)) %>%
+                        dplyr::select(CEL) %>% .[,1],names(.)))
+
+test_data <- test_tlt0_exprs %>%
   t() %>%
   as.data.frame() %>%
   dplyr::add_rownames(var = "CEL") %>%
@@ -223,10 +243,11 @@ plot(tuneResult)
 print("test SVM")
 
 tunedModel <- tuneResult$best.model
-predicted <- predict(tunedModel,training_data) %>% as.numeric()
+predicted <- predict(tunedModel,test_data) %>% as.numeric()
 error <- training_data$SYMPTSCORE_SC3 - predicted
 print(paste("RMSE:",rmse(error)))
 
 print("store SVM")
 
 save(tunedModel, file="/home/burkhart/Software/TSAR/src/tunedModel.rda")
+print(paste(" finished: ",proc.time() - start_time))
