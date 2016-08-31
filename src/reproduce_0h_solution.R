@@ -7,6 +7,16 @@ print("date: August 30, 2016")
 print("start time:")
 print(start_time)
 
+library(knitr)
+library(magrittr)
+library(dplyr)
+library(affy)
+library(ggplot2)
+library(limma)
+library(pheatmap)
+library(snm)
+library(e1071)
+
 OUT_DIR <- "/home/burkhart/Software/TSAR/src/"
 DATA_DIR <- "/media/burkhart/D052-7853/McWeeney/TSAR/"
 TRAIN_CLINICL <- paste(DATA_DIR, "ViralChallenge_training_CLINICAL.tsv", sep = "")
@@ -135,29 +145,32 @@ earliest_training_data <- earliest_exprs %>%
   dplyr::add_rownames(var = "CEL") %>%
   dplyr::full_join(earliest_scores,by="CEL")
 
-# tune svm using k=10-fold cross validation
-tunedModels <- e1071::tune(e1071::svm, 
-                          SYMPTSCORE_SC3 ~ .,
-                          data = earliest_training_data %>%
-                            dplyr::select(-CEL, -SUBJECTID) ,
-                          ranges = list(epsilon = seq(0,1,0.1), cost = 2^(2:9)),
-                          cross = 10)
-best_svm <- tunedModels$best.model
-
 print("Leave-one-out Cross-Validations in the Training Data")
 earliest_loocv <- data.frame(
   SUBJECTID=earliest_training_data$SUBJECTID,
   LOGSYMPTSCORE_SC3=NA)
 
+loo_svms <- list()
+
 for(out_row in 1:nrow(earliest_training_data)){
   print(paste("holding out row ",out_row,"...",sep=""))
+  loo_earliest_training_data <- earliest_training_data %>%
+    dplyr::select(-CEL,-SUBJECTID) %>%
+    .[-out_row,]
+  
+  loo_svms[[out_row]] <- e1071::svm(SYMPTSCORE_SC3 ~ .,
+                        data = loo_earliest_training_data,
+                        epsilon = 0.6,
+                        cost = 8)
   
   loo_earliest_test_row <- earliest_training_data %>%
     dplyr::select(-CEL,-SUBJECTID) %>%
     .[out_row,]
   
-  earliest_loocv[out_row,2] <- predict(best_svm, loo_earliest_test_row) %>% log10()
+  earliest_loocv[out_row,2] <- predict(loo_svms[[out_row]], loo_earliest_test_row) %>% log10()
 }
+
+best_svm <- loo_svms[[match(min(earliest_loocv[,2]),earliest_loocv[,2])]]
 
 write.table(earliest_loocv,
             file=paste(OUT_DIR,"Subchallenge3_burkhajo_Time0_LOOCVs.csv",sep=""),
