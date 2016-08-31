@@ -23,21 +23,21 @@ Features were selected following supervised normalization of microarray data. Be
 
 ##Methods
 ###Common between 0h and 24h
-The provided RMA expression and clinical training data was filtered to remove sham subjects and unused timepoints. Only each subject's earliest and latest timepoints (<= 24h) were retained. Supervised normalization was applied to the remaining expression data using timepoint (earliest or latest) as the biological variables and both study and gender as adjustment variables. The 2000 most variable non-control probes following supervised normalization were retained as features. 
+The provided RMA expression and clinical training data was filtered to remove sham subjects and unused timepoints. Only each subject's earliest and latest timepoints (<= 24h) were retained. Five iterations of supervised normalization were applied to the remaining expression data using timepoint (earliest or latest) as the biological variables and both study and gender as adjustment variables. The 2000 most variable non-control probes following supervised normalization were retained as features. 
 
 ###0h
-Under the assumption that non-logarithmic scores may be easier to learn, each training subject's log symptom score was transformed (10^LOGSYMPTSCORE_SC3^) to yield a symptom score. Support vector machines were tuned using k=10 fold cross-validation on each subject's earliest snm-normalized microarray data varying epsilon (from 0 to 1 by increments of 0.1) and cost (from 2^2^ to 2^9^ by increments of powers of two) to predict the symptom score. The best model found using k=10 fold cross-validation was used to perform leave-one-out cross-validation (LOOCV) on each subject's earliest snm-normalized microarray data (predicting symptom scores). The LOOCV predictions were then log10-transformed to yield a predicted LOGSYMPTSCORE_SC3 value.
+Under the assumption that non-logarithmic scores may be easier to learn, each training subject's log symptom score was transformed (10^LOGSYMPTSCORE_SC3^) to yield a symptom score. Support vector machines were tuned using k=10 fold cross-validation on each subject's earliest snm-normalized microarray data varying epsilon (from 0 to 1 by increments of 0.1) and cost (from 2^2^ to 2^9^ by increments of powers of two) to predict the symptom score. The best model found using k=10 fold cross-validation had an epsilon of 0.6 and a cost of 8. These parameters were used to perform leave-one-out cross-validation (LOOCV) on each subject's earliest snm-normalized microarray data (predicting symptom scores). The LOOCV predictions were then log10-transformed to yield a predicted LOGSYMPTSCORE_SC3 value.
 
 &nbsp;
 
-The provided RMA-normalized and clinical test data (Phase 1, Phase 2, and Phase 3) was filtered to remove sham subjects (0) and unused timepoints. Only each subject's earliest timepoint was retained. The best model found during training was used to predict the symptom score for each subject, which was then log10-transformed to yield a predicted LOGSYMPTSCORE_SC3 value.
+The provided RMA-normalized and clinical test data (Phase 1, Phase 2, and Phase 3) was filtered to remove sham subjects (0) and unused timepoints. Only each subject's earliest timepoint was retained. The model with the least error found during LOOCV was used to predict the symptom score for each subject, which was then log10-transformed to yield a predicted LOGSYMPTSCORE_SC3 value.
 
 ###24h
-Similarly to the 0h prediction solution outlined above, each training subject's log symptom score was transformed (10^LOGSYMPTSCORE_SC3^) to yield a symptom score. Support vector machines were tuned using k=10 fold cross-validation on each subject's *latest* snm-normalized microarray data varying epsilon (from 0 to 1 by increments of 0.1) and cost (from 2^2^ to 2^9^ by increments of powers of two) to predict the symptom score. The best model found using k=10 fold cross-validation was used to perform leave-one-out cross-validation (LOOCV) on each subject's *latest* snm-normalized microarray data (predicting symptom scores). The LOOCV predictions were then log10-transformed to yield a predicted LOGSYMPTSCORE_SC3 value.
+Similarly to the 0h prediction solution outlined above, each training subject's log symptom score was transformed (10^LOGSYMPTSCORE_SC3^) to yield a symptom score. Support vector machines were tuned using k=10 fold cross-validation on each subject's *latest* snm-normalized microarray data varying epsilon (from 0 to 1 by increments of 0.1) and cost (from 2^2^ to 2^9^ by increments of powers of two) to predict the symptom score. The best model found using k=10 fold cross-validation had an epsilon of 0.1 and a cost of 8. These parameters were used to perform leave-one-out cross-validation (LOOCV) on each subject's *latest* snm-normalized microarray data (predicting symptom scores). The LOOCV predictions were then log10-transformed to yield a predicted LOGSYMPTSCORE_SC3 value.
 
 &nbsp;
 
-Also similarly to the 0h prediction solution, the provided RMA-normalized and clinical test data (Phase 1, Phase 2, and Phase 3) was filtered to remove sham subjects (0) and unused timepoints. Only each subject's *latest* timepoint was retained. The best model found during training was used to predict the symptom score for each subject, which was then log10-transformed to yield a predicted LOGSYMPTSCORE_SC3 value.
+Also similarly to the 0h prediction solution, the provided RMA-normalized and clinical test data (Phase 1, Phase 2, and Phase 3) was filtered to remove sham subjects (0) and unused timepoints. Only each subject's *latest* timepoint was retained. The model with the least error found during LOOCV was used to predict the symptom score for each subject, which was then log10-transformed to yield a predicted LOGSYMPTSCORE_SC3 value.
 
 ##Conclusion/Discussion
 Though supervised microarray normalization appeared to be an effective remedy, the study-specific batch effects present in this challenge may limit the power to discover an expression signature well correlated with symptom scores. Additionally, several subjects reported symptoms at or shortly after 0h, indicating a nocebo-effect was present. This could perhaps be ameliorated some by more objective symptom quantification. 
@@ -45,8 +45,8 @@ Though supervised microarray normalization appeared to be an effective remedy, t
 ## Submission Requirements
 Expression Time Range | Predictors | Code | Leave-one-out CVs | Official Synapse Submission File | Official Synapse Submission ID
 -|-|-|-|-|-
-`Up to Hour 0`| syn7207901 | syn7207894 | syn7207900 | syn7207899 | 7207905
-`Up to Hour 24`| syn7207898 | syn7207896 | syn7207897 | syn7207895 | 7207906
+`Up to Hour 0`| syn7207901 | syn7207894 | syn7207900 | syn7207899 | 7209256
+`Up to Hour 24`| syn7207898 | syn7207896 | syn7207897 | syn7207895 | 7209257
 
 ##References
 [0] Respiratory Viral DREAM Challenge (syn5647810)
