@@ -200,9 +200,10 @@ phas3_rma_exprs <- as.matrix(
   )
 )
 
-test_rma_exprs <- rbind(phas1_rma_exprs %>% t(),
+test_rma_eset <- ExpressionSet(
+  assayData = rbind(phas1_rma_exprs %>% t(),
                         phas2_rma_exprs %>% t(),
-                        phas3_rma_exprs %>% t()) %>% t()
+                        phas3_rma_exprs %>% t()) %>% t())
 
 # load testing clinical data
 phas1_clinicl_df <- read.table(PHAS1_CLINICL, header = T, sep = "\t")
@@ -224,7 +225,8 @@ test_earliest <- test_clinicl_df %>%
   dplyr::group_by(SUBJECTID) %>%
   dplyr::arrange(TIMEHOURS) %>%
   dplyr::slice(1) %>%
-  dplyr::ungroup()
+  dplyr::ungroup() %>%
+  as.data.frame()
 
 test_earliest_exprs <- test_rma_eset[top_2000$probesetid, ] %>%
   exprs() %>%
@@ -242,13 +244,13 @@ test_earliest_subjects <- test_earliest[match(test_earliest_exprs %>%
 test_earliest_data <- test_earliest_exprs %>%
   t() %>%
   as.data.frame() %>%
-  dplyr::add_rownames(var = "CEL")
+  dplyr::add_rownames(var = "CEL") %>%
   dplyr::full_join(test_earliest_subjects,by="CEL")
 
 # predict scores
 test_predictions <- predict(best_svm,
                             test_earliest_data %>%
-                             dplyr::select(-CEL, -SUBJECTID)) %>%
+                              dplyr::select(-CEL,-SUBJECTID)) %>%
                              log10()
 
 leaderboard_submission <- data.frame(
@@ -256,9 +258,8 @@ leaderboard_submission <- data.frame(
   LOGSYMPTSCORE_SC3 = test_predictions) %>%
   dplyr::arrange(SUBJECTID)
 
-print("store phas3 predictions")
 write.table(leaderboard_submission,
-            file="/home/burkhart/Software/TSAR/src/Subchallenge3_burkhajo_Time0_LeaderboardPredictions.csv.csv",
+            file="/home/burkhart/Software/TSAR/src/Subchallenge3_burkhajo_Time0_LeaderboardPredictions.csv",
             sep=",",
             row.names=FALSE,
             quote=FALSE)
