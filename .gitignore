@@ -6,7 +6,7 @@ src/Figs/*.pdf
 src/*.svg
 
 # ignore Rdata
-src/*.rda
+#src/*.rda
 
 # hidden files
 src/.*
