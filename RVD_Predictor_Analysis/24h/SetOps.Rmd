@@ -1,0 +1,155 @@
+---
+title: "RVD_24h"
+author: "Joshua Burkhart"
+date: "5/4/2017"
+output: 
+  pdf_document: 
+      latex_engine: xelatex
+---
+
+```{r load, include=FALSE}
+data <- lapply(dir(pattern="*.csv"),read.csv,stringsAsFactors = FALSE)
+
+for(i in 1:length(data)){
+  print(data[i][[1]] %>% colnames())
+}
+
+ensembl_lists <- list(
+  study8 = data[8][[1]][1]
+)
+
+gene_lists <- list(
+  study3 = data[3][[1]][2],
+  study13 = data[13][[1]][1]
+)
+
+probe_lists <- list(
+  study2 = unique(data[2][[1]][1]),
+  study4 = unique(data[4][[1]][2]),
+  study5 = unique(data[5][[1]][1]),
+  study6 = unique(data[6][[1]][1]),
+  study7 = unique(data[7][[1]][2]),
+  study9 = unique(data[9][[1]][1]),
+  study10 = unique(data[10][[1]][1]),
+  study12 = unique(data[12][[1]][1]),
+  study14 = unique(data[14][[1]][2]),
+  study15 = unique(data[15][[1]][1]),
+  study16 = unique(data[16][[1]][1]),
+  study17 = unique(sapply(data[17][[1]][1], function(x) gsub("\'", "", x))),
+  study18 = unique(data[18][[1]][2])
+)
+
+probe_intersect <- Reduce(intersect, list(
+                            unlist(probe_lists[1]),
+                            unlist(probe_lists[2]),
+                            unlist(probe_lists[3]),
+                            unlist(probe_lists[4]),
+                            unlist(probe_lists[5]),
+                            unlist(probe_lists[6]),
+                            unlist(probe_lists[7]),
+                            unlist(probe_lists[8]),
+                            unlist(probe_lists[9]),
+                            unlist(probe_lists[10]),
+                            unlist(probe_lists[11]),
+                            unlist(probe_lists[12]),
+                            unlist(probe_lists[13])))
+
+print(past("length(probe_intersect):",length(probe_intersect),sep=" "))
+
+probe_union <- Reduce(union, list(
+                            unlist(probe_lists[1]),
+                            unlist(probe_lists[2]),
+                            unlist(probe_lists[3]),
+                            unlist(probe_lists[4]),
+                            unlist(probe_lists[5]),
+                            unlist(probe_lists[6]),
+                            unlist(probe_lists[7]),
+                            unlist(probe_lists[8]),
+                            unlist(probe_lists[9]),
+                            unlist(probe_lists[10]),
+                            unlist(probe_lists[11]),
+                            unlist(probe_lists[12]),
+                            unlist(probe_lists[13])))
+
+print(past("length(probe_union):",length(probe_union),sep=" "))
+
+probe_support <- table(c(
+                            unlist(probe_lists[1]),
+                            unlist(probe_lists[2]),
+                            unlist(probe_lists[3]),
+                            unlist(probe_lists[4]),
+                            unlist(probe_lists[5]),
+                            unlist(probe_lists[6]),
+                            unlist(probe_lists[7]),
+                            unlist(probe_lists[8]),
+                            unlist(probe_lists[9]),
+                            unlist(probe_lists[10]),
+                            unlist(probe_lists[11]),
+                            unlist(probe_lists[12]),
+                            unlist(probe_lists[13])))
+
+hist(probe_support, col="gray", labels = TRUE,ylim=c(0,30000))
+
+# CD8A CD8a molecule [ Homo sapiens (human) ]
+# SPP1 secreted phosphoprotein 1 [ Homo sapiens (human) ]
+probe_support[probe_support == 6] %>% labels()
+
+probe_support[probe_support == 5] %>% labels()
+
+probe_support[probe_support == 4] %>% labels()
+
+probe_support[probe_support == 3] %>% labels()
+```
+6-support:
+205671_s_at
+205758_at
+209875_s_at
+211560_s_at
+213655_at
+213831_at
+
+5-support:
+201015_s_at
+201681_s_at
+202203_s_at
+202218_s_at
+202412_s_at
+202912_at
+203470_s_at
+203628_at
+203936_s_at
+203940_s_at
+204467_s_at
+205229_s_at
+205382_s_at
+205821_at
+205826_at
+205896_at
+205967_at
+206026_s_at
+207667_s_at
+207979_s_at
+209396_s_at
+209451_at
+209522_s_at
+209555_s_at
+210137_s_at
+210612_s_at
+212813_at
+213274_s_at
+213338_at
+213348_at
+213800_at
+215211_at
+215483_at
+215652_at
+215819_s_at
+216841_s_at
+218055_s_at
+219890_at
+220051_at
+220532_s_at
+221690_s_at
+221978_at  
+222211_x_at
+33646_g_at
