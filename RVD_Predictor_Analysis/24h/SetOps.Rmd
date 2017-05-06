@@ -2,10 +2,23 @@
 title: "RVD_24h"
 author: "Joshua Burkhart"
 date: "5/6/2017"
-output: 
-  pdf_document: 
-      latex_engine: xelatex
+output: pdf_document
 ---
+
+```{r knitr_chunk_options, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE,
+                      results='as-is', # markup marks up the results; asis return texts as-is; hide hides the results
+                      comment=NA,
+                      message=FALSE,
+                      warning=FALSE,
+                      error=FALSE,
+                      fig.width=8,
+                      fig.align='center',
+                      fig.path="Figs/",
+                      dev="png",
+                      dev.args=list(type="cairo"),
+                      dpi=96)
+```
 
 ```{r libraries}
 library(hgu133a2.db)
@@ -176,9 +189,11 @@ gene_support <- table(c(unlist(gene_lists[1]),
                             unlist(gene_lists[16])))
 
 predictor_support_df <- data.frame(
-  study = names(gene_support),
+  predictor = names(gene_support),
   predictor_support = gene_support
 )
+
+predictor_support_df <- predictor_support_df %>% dplyr::filter(predictor != "NA") # not sure how NA's got in here
 
 predictor_support_df %>%
   ggplot(aes(x=reorder(predictor_support.Freq,-predictor_support.Freq))) + 
@@ -189,7 +204,6 @@ predictor_support_df %>%
   xlab("gene support (# studies including gene)") +
   ylab("gene count (# genes)")
 
-#gene_support[gene_support == 13] %>% labels() # this is just "NA" -- maybe some studies include this as a text string?
 gene_support[gene_support == 10] %>% labels()
 gene_support[gene_support == 9] %>% labels()
 gene_support[gene_support == 8] %>% labels()
