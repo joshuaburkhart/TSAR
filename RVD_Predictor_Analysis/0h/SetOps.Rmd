@@ -1,0 +1,222 @@
+---
+title: "RVD_0h"
+author: "Joshua Burkhart"
+date: "5/9/2017"
+output: pdf_document
+---
+
+```{r knitr_chunk_options, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE,
+                      results='as-is', # markup marks up the results; asis return texts as-is; hide hides the results
+                      comment=NA,
+                      message=FALSE,
+                      warning=FALSE,
+                      error=FALSE,
+                      fig.width=8,
+                      fig.align='center',
+                      fig.path="Figs/",
+                      dev="png",
+                      dev.args=list(type="cairo"),
+                      dpi=96)
+```
+
+```{r libraries}
+library(hgu133a2.db)
+library(dplyr)
+library(magrittr)
+library(biomaRt)
+library(annotate)
+library(ggplot2)
+library(GOstats)
+```
+
+```{r globals}
+ENTREZ_UNIVERSE <- select(hgu133a2.db,keys=ls(hgu133a2ENTREZID),columns="ENTREZID") %>% .[,"ENTREZID"]
+```
+
+```{r helper_functions}
+
+#ensemblIDs2GeneNames <- function(ensemblIDs){
+#  ensemblIDs <- na.omit(ensemblIDs)
+#  return(unique(getBM(filters="ensembl_gene_id",
+#        attributes=c("hgnc_symbol"),
+#        values=ensemblIDs,
+#        mart=useDataset("hsapiens_gene_ensembl",useMart("ensembl")))))
+#}
+
+probeIDs2GeneNames <- function(probeIDs){
+  probeIDs <- sapply(na.omit(probeIDs),function(x) gsub("^X","", x))
+  return(toupper(unique(as.character(na.omit(lookUp(probeIDs, "hgu133a2.db", "SYMBOL"))))))
+}
+
+GOBarplot <- function(query_gene_symbols,bar_color,plot_title){
+  
+  entrez_universe <- ENTREZ_UNIVERSE
+  entrez_query <- select(org.Hs.eg.db, query_gene_symbols, "ENTREZID", "SYMBOL")
+  
+  entrez_universe <- entrez_universe[!duplicated(entrez_universe)]
+  entrez_query <- entrez_query[!duplicated(entrez_query[,1]), 2]
+  
+  hgCutoff <- 0.001
+  params <- new("GOHyperGParams",
+              geneIds=entrez_query,
+              universeGeneIds=entrez_universe,
+              annotation="hgu133a2.db",
+              ontology="BP",
+              pvalueCutoff=hgCutoff,
+              conditional=FALSE,
+              testDirection="over")
+  hgOver <- hyperGTest(params)
+  hgOverAtLeast2GenesPerGOCategory <- hgOver %>% summary(categorySize=2)
+  hgOverSummary <- hgOver %>% summary()
+
+  qc_df <- data.frame(
+    Ontology=as.character(hgOverAtLeast2GenesPerGOCategory$Term),
+    log10.p.value=log10(hgOverAtLeast2GenesPerGOCategory$Pvalue)
+    )
+
+qc_df %>% dplyr::slice(1:30) %>% ggplot(
+  aes(x=reorder(Ontology,-log10.p.value),y=-log10.p.value)) +
+  theme(legend.position="none") +
+  geom_bar(stat="identity", fill=bar_color) +
+  geom_text(position="stack",aes(label=round(-log10.p.value,digits=3),hjust=1.1)) +
+  coord_flip() +
+  labs(x="GO Biological Function",y="-log10(p-value)",title=plot_title) %>%
+  return()
+}
+
+```
+
+```{r load, include=FALSE}
+data <- lapply(dir(pattern="*.csv"),read.csv,stringsAsFactors = FALSE)
+
+for(i in 1:length(data)){
+  print(data[i][[1]] %>% colnames())
+}
+
+gene_lists <- list(
+  # [1] "Aganita_ViralChallenge_LOGSYMPTSCORE_SC3_UptoHour0.csv" (no predictors)
+  # [2] "sub30-35p.csv" (no predictors)
+  Rchow = probeIDs2GeneNames(unique(unlist(data[3][[1]][1]))), # [3] "Subchallenge2_Rchow_Time0_Predictors.csv"
+  aydin = probeIDs2GeneNames(unique(unlist(data[4][[1]][2]))), # [4] "Subchallenge3_aydin_Time0_Predictors.csv"
+   burkhajo = probeIDs2GeneNames(unique(unlist(data[5][[1]][1]))), # [5] "Subchallenge3_burkhajo_Time0_Predictors.csv"  
+  ChengzheTian = probeIDs2GeneNames(unique(unlist(data[6][[1]][1]))), # [6] "Subchallenge3_ChengzheTian_Time0_Predictors.csv"
+  cwruPatho = probeIDs2GeneNames(unique(unlist(data[7][[1]][2]))), # [7] "Subchallenge3_cwruPatho_Time0_Predictors.csv"
+  Gustavssonlab = probeIDs2GeneNames(unique(unlist(data[8][[1]][1]))), # [8] "Subchallenge3_Gustavssonlab_Nordlinglab_0_Predictors.csv"
+  JayHawks = probeIDs2GeneNames(unique(unlist(data[9][[1]][2]))), # [9] "Subchallenge3_JayHawks-RVDC_Time0_Predictors.csv"
+  jdn = probeIDs2GeneNames(unique(sapply(unlist(data[10][[1]][1]), function(x) gsub("_max","",x)))), # [10] "Subchallenge3_jdn_Time0_Predictors.csv"
+  jhou = probeIDs2GeneNames(unique(unlist(data[11][[1]][1]))), # [11] "Subchallenge3_jhou_Time0_Predictors.csv"
+  SBiEKAIST = toupper(unique(unlist(data[12][[1]][1]))),# [12] "Subchallenge3_SBiE_KAIST_Time0_Predictors.csv"
+  SchrodingersCat = probeIDs2GeneNames(unique(unlist(data[13][[1]][1]))), # [13] "Subchallenge3_SchrodingersCat_Time0_Predictors.csv"
+  Shosty = toupper(unique(unlist(data[14][[1]][1]))), # [14] "Subchallenge3_Shosty_UpToHour0_Predictors.csv"
+  SSNDREAMTEAM = probeIDs2GeneNames(unique(unlist(data[15][[1]][2]))), # [15] "Subchallenge3_SSN DREAM TEAM-0_Predictors.csv"
+  SunilKumar = probeIDs2GeneNames(unique(unlist(data[16][[1]][1]))), # [16] "Subchallenge3_SunilKumar_Time0_Predictors.csv"
+  TempleDABI = probeIDs2GeneNames(unique(unlist(data[17][[1]][1]))), # [17] "Subchallenge3_TempleDABI_Time0_Predictors.csv"
+  USPteam = probeIDs2GeneNames(unique(as.character(sapply(data[18][[1]][1], function(x) gsub("\'", "", x))))), # [18] "subchallenge3_USP team_time0_Predictors.csv"
+  ViResPred = probeIDs2GeneNames(unique(unlist(data[19][[1]][2]))) # [19] "Subchallenge3_ViResPred_Time0_Predictors.csv"
+)
+
+predictor_counts_df <- data.frame(
+  study = names(gene_lists),
+  predictor_count = as.numeric(summary(gene_lists)[,1])
+)
+
+predictor_counts_df %>%
+  ggplot(aes(x=reorder(study,-predictor_count),
+             y=predictor_count)) + 
+  geom_bar(stat="identity") +
+  geom_text(label=predictor_counts_df$predictor_count,vjust=-1,size=3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylim(0,13000) +
+  xlab("study name") +
+  ylab("gene count (# genes)")
+
+gene_intersect <- Reduce(intersect, list(
+                            unlist(gene_lists[1]),
+                            unlist(gene_lists[2]),
+                            unlist(gene_lists[3]),
+                            unlist(gene_lists[4]),
+                            unlist(gene_lists[5]),
+                            unlist(gene_lists[6]),
+                            unlist(gene_lists[7]),
+                            unlist(gene_lists[8]),
+                            unlist(gene_lists[9]),
+                            unlist(gene_lists[10]),
+                            unlist(gene_lists[11]),
+                            unlist(gene_lists[12]),
+                            unlist(gene_lists[13]),
+                            unlist(gene_lists[14]),
+                            unlist(gene_lists[15]),
+                            unlist(gene_lists[16])))
+
+print(paste("length(gene_intersect):",length(gene_intersect),sep=" "))
+
+gene_union <- Reduce(union, list(
+                            unlist(gene_lists[1]),
+                            unlist(gene_lists[2]),
+                            unlist(gene_lists[3]),
+                            unlist(gene_lists[4]),
+                            unlist(gene_lists[5]),
+                            unlist(gene_lists[6]),
+                            unlist(gene_lists[7]),
+                            unlist(gene_lists[8]),
+                            unlist(gene_lists[9]),
+                            unlist(gene_lists[10]),
+                            unlist(gene_lists[11]),
+                            unlist(gene_lists[12]),
+                            unlist(gene_lists[13]),
+                            unlist(gene_lists[14]),
+                            unlist(gene_lists[15]),
+                            unlist(gene_lists[16])))
+
+print(paste("length(gene_union):",length(gene_union),sep=" "))
+
+gene_support <- table(c(unlist(gene_lists[1]),
+                            unlist(gene_lists[2]),
+                            unlist(gene_lists[3]),
+                            unlist(gene_lists[4]),
+                            unlist(gene_lists[5]),
+                            unlist(gene_lists[6]),
+                            unlist(gene_lists[7]),
+                            unlist(gene_lists[8]),
+                            unlist(gene_lists[9]),
+                            unlist(gene_lists[10]),
+                            unlist(gene_lists[11]),
+                            unlist(gene_lists[12]),
+                            unlist(gene_lists[13]),
+                            unlist(gene_lists[14]),
+                            unlist(gene_lists[15]),
+                            unlist(gene_lists[16])))
+
+predictor_support_df <- data.frame(
+  predictor = names(gene_support),
+  predictor_support = gene_support
+)
+
+predictor_support_df <- predictor_support_df %>% dplyr::filter(predictor != "NA") # not sure how NA's got in here
+
+predictor_support_df %>%
+  ggplot(aes(x=reorder(predictor_support.Freq,-predictor_support.Freq))) + 
+  geom_bar(stat="count") +
+  geom_text(stat="count",aes(label=..count..),vjust=-1,size=3) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylim(0,9000) +
+  xlab("gene support (# studies including gene)") +
+  ylab("gene count (# genes)")
+
+gene_support[gene_support == 10] %>% labels()
+gene_support[gene_support == 9] %>% labels()
+gene_support[gene_support == 8] %>% labels()
+gene_support[gene_support == 7] %>% labels()
+gene_support[gene_support == 6] %>% labels()
+gene_support[gene_support == 5] %>% labels()
+gene_support[gene_support == 4] %>% labels()
+
+# GOBarplot(names(unlist((gene_support[gene_support == 9]))),"yellow","GO Biological Processes supported by 9 studies") -- no significant enrichment
+GOBarplot(names(unlist((gene_support[gene_support == 8]))),"yellow","GO Biological Processes supported by 8 studies")
+GOBarplot(names(unlist((gene_support[gene_support == 7]))),"yellow","GO Biological Processes supported by 7 studies")
+GOBarplot(names(unlist((gene_support[gene_support == 6]))),"yellow","GO Biological Processes supported by 6 studies")
+GOBarplot(names(unlist((gene_support[gene_support == 5]))),"yellow","GO Biological Processes supported by 5 studies")
+GOBarplot(names(unlist((gene_support[gene_support == 4]))),"yellow","GO Biological Processes supported by 4 studies")
+
+```
