@@ -1,8 +1,10 @@
 ---
 title: "RVD_0h"
 author: "Joshua Burkhart"
-date: "5/9/2017"
-output: pdf_document
+date: "5/23/2017"
+output: 
+  pdf_document: 
+    latex_engine: xelatex
 ---
 
 ```{r knitr_chunk_options, echo=FALSE}
@@ -28,6 +30,7 @@ library(biomaRt)
 library(annotate)
 library(ggplot2)
 library(GOstats)
+library(ReactomePA)
 ```
 
 ```{r globals}
@@ -59,7 +62,7 @@ GOBarplot <- function(query_gene_symbols,bar_color,plot_title){
   
   hgCutoff <- 0.001
   params <- new("GOHyperGParams",
-              geneIds=entrez_query,
+              geneIds=unique(entrez_query),
               universeGeneIds=entrez_universe,
               annotation="hgu133a2.db",
               ontology="BP",
@@ -82,6 +85,37 @@ qc_df %>% dplyr::slice(1:30) %>% ggplot(
   geom_text(position="stack",aes(label=round(-log10.p.value,digits=3),hjust=1.1)) +
   coord_flip() +
   labs(x="GO Biological Function",y="-log10(p-value)",title=plot_title) %>%
+  return()
+}
+
+ReactomeBarplot <- function(query_gene_symbols,bar_color,plot_title){
+  
+  entrez_universe <- ENTREZ_UNIVERSE
+  entrez_query <- select(org.Hs.eg.db, query_gene_symbols, "ENTREZID", "SYMBOL")
+  
+  entrez_universe <- entrez_universe[!duplicated(entrez_universe)]
+  entrez_query <- entrez_query[!duplicated(entrez_query[,1]), 2]
+  
+  reactomeEnrich <- enrichPathway(gene=unique(entrez_query),
+                                     pvalueCutoff = 0.05,
+                                     readable = T)
+  reactomeEnrichAtLeast2GenesPerPathway <- reactomeEnrich %>% 
+    as.data.frame() %>%
+    dplyr::filter(Count >= 2)
+  reactomeEnrichSummary <- reactomeEnrich %>% summary()
+
+  qc_df <- data.frame(
+    Pathway=as.character(reactomeEnrichAtLeast2GenesPerPathway$Description),
+    log10.p.value=log10(reactomeEnrichAtLeast2GenesPerPathway$pvalue)
+    )
+
+qc_df %>% dplyr::slice(1:30) %>% ggplot(
+  aes(x=reorder(Pathway,-log10.p.value),y=-log10.p.value)) +
+  theme(legend.position="none") +
+  geom_bar(stat="identity", fill=bar_color) +
+  geom_text(position="stack",aes(label=round(-log10.p.value,digits=3),hjust=1.1)) +
+  coord_flip() +
+  labs(x="Reactome Pathway",y="-log10(p-value)",title=plot_title) %>%
   return()
 }
 
@@ -219,4 +253,5 @@ GOBarplot(names(unlist((gene_support[gene_support == 6]))),"yellow","GO Biologic
 GOBarplot(names(unlist((gene_support[gene_support == 5]))),"yellow","GO Biological Processes supported by 5 studies")
 GOBarplot(names(unlist((gene_support[gene_support == 4]))),"yellow","GO Biological Processes supported by 4 studies")
 
+ReactomeBarplot(names(unlist((gene_support[gene_support >= 4]))),"lightskyblue","Reactome Pathways supported by at least 4 studies")
 ```
