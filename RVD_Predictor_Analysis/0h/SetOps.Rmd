@@ -9,7 +9,7 @@ output:
 
 ```{r knitr_chunk_options, echo=FALSE}
 knitr::opts_chunk$set(echo=FALSE,
-                      results='as-is', # markup marks up the results; asis return texts as-is; hide hides the results
+                      results='markup', # markup marks up the results; asis return texts as-is; hide hides the results
                       comment=NA,
                       message=FALSE,
                       warning=FALSE,
@@ -121,7 +121,7 @@ qc_df %>% dplyr::slice(1:30) %>% ggplot(
 
 ```
 
-```{r load, include=FALSE}
+```{r load, include=TRUE}
 data <- lapply(dir(pattern="*.csv"),read.csv,stringsAsFactors = FALSE)
 
 for(i in 1:length(data)){
