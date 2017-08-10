@@ -47,6 +47,8 @@ ENTREZ_UNIVERSE <- select(hgu133a2.db,keys=ls(hgu133a2ENTREZID),columns="ENTREZI
 #        mart=useDataset("hsapiens_gene_ensembl",useMart("ensembl")))))
 #}
 
+# an element is omitted if it is equal to any previous element
+# https://stat.ethz.ch/R-manual/R-devel/library/base/html/unique.html
 probeIDs2GeneNames <- function(probeIDs){
   probeIDs <- sapply(na.omit(probeIDs),function(x) gsub("^X","", x))
   return(toupper(unique(as.character(na.omit(lookUp(probeIDs, "hgu133a2.db", "SYMBOL"))))))

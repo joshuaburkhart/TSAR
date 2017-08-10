@@ -1,0 +1,55 @@
+---
+title: "Subchallenge 1 Report"
+author: "Joshua Burkhart"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+---
+
+# load libraries
+```{r load_libraries}
+library(knitr)
+```
+
+# set global options
+```{r set_global_options}
+knitr::opts_chunk$set(echo=FALSE,
+                      results='markup',
+                      comment=NA,
+                      message=FALSE,
+                      warning=FALSE,
+                      error=FALSE,
+                      fig.width=8,
+                      fig.align='center',
+                      fig.path="Figs/",
+                      dev="png",
+                      dev.args=list(type="cairo"),
+                      dpi=96)
+```
+
+# download data
+```{r download_data}
+read_chunk("../data/Download.R")
+```
+
+# calculate genesets
+```{r calculate_genesets}
+read_chunk("./per_study/PerStudyGeneSets.R")
+read_chunk("./per_subchallenge/PerSubchallengeGeneSets.R")
+read_chunk("./per_timepoint/PerTimepointGeneSets.R")
+```
+
+# generate heatmaps
+```{r generate_heatmaps}
+read_chunk("./per_study/PerStudyHeatmap.R")
+read_chunk("./per_subchallenge/PerSubchallengeHeatmap.R")
+read_chunk("./per_timepoint/PerTimepointHeatmap.R")
+```
+
+# perform pathway analysis
+```{r perform_pathway_analysis}
+read_chunk("./per_study/PerStudyPA.R")
+read_chunk("./per_subchallenge/PerSubchallengePA.R")
+read_chunk("./per_timepoint/PerTimepointPA.R")
+```
