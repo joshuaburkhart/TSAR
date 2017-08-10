@@ -1,0 +1,21 @@
+# Studies
+H1 = "H1N1"
+H3 = "H3N2"
+RH = "Rhinovirus"
+
+# Subchallenges
+S1 = "subchallenge 1"
+S2 = "subchallenge 2"
+S3 = "subchallenge 3"
+
+# Timepoints
+T0 = "timepoint 0h"
+T2 = "timepoint 24h"
+
+# Team Names
+NA = "team Nautilus"
+AY = "team aydin"
+SS = "team SSN_Dream_Team"
+TX = "team Txsolo"
+CW = "team cwruPatho"
+AG = "team Aganita"
