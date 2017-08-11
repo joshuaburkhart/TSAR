@@ -1,0 +1,5 @@
+T0 = "lightskyblue"
+T2 = "midnightblue"
+H1 = "pink"
+H3 = "red"
+RH = "gold"
