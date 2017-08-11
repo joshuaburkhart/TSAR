@@ -7,6 +7,7 @@
 # load libraries
 library(SuperExactTest)
 library(org.Hs.eg.db)
+library(VennDiagram)
 library(hgu133a2.db)
 library(ReactomePA)
 library(annotate)
@@ -15,7 +16,10 @@ library(ggplot2)
 library(dplyr)
 
 # gloabal variables
+P_VAL_THRESH = 0.005
+
 ENTREZ_UNIVERSE <- AnnotationDbi::select(hgu133a2.db,keys=ls(hgu133a2ENTREZID),columns="ENTREZID") %>% .[,"ENTREZID"]
+ENTREZ_UNIVERSE <- ENTREZ_UNIVERSE[!duplicated(ENTREZ_UNIVERSE)]
 
 DOWNLOAD_DIR <- "/home/burkhart/Software/TSAR/RVD_Predictor_Analysis/data/downloads/"
 NA_S1_T0 <- paste(DOWNLOAD_DIR,"Subchallenge1_Nautilus_Time0_Predictors.csv",sep="")
@@ -61,19 +65,21 @@ AG_S3_T2 <- paste(DOWNLOAD_DIR,"Subchallenge3_Aganita_Time24_Predictors.csv",sep
 # helper functions
 ReactomeBarplot <- function(query_gene_symbols,bar_color,plot_title){
   
-  entrez_universe <- ENTREZ_UNIVERSE
-  print(query_gene_symbols)
   entrez_query <- AnnotationDbi::select(org.Hs.eg.db, query_gene_symbols, "ENTREZID", "SYMBOL")
   
-  entrez_universe <- entrez_universe[!duplicated(entrez_universe)]
   entrez_query <- entrez_query[!duplicated(entrez_query[,1]), 2]
   
   reactomeEnrich <- ReactomePA::enrichPathway(gene=unique(entrez_query),
-                                  pvalueCutoff = 0.05,
+                                  organism = "human",
+                                  pvalueCutoff = 1.0,
+                                  pAdjustMethod = "BH",
+                                  qvalueCutoff = 1.0,
+                                  universe = ENTREZ_UNIVERSE,
+                                  minGSSize = 2,
+                                  maxGSSize = 1000,
                                   readable = T)
   reactomeEnrichAtLeast2GenesPerPathway <- reactomeEnrich %>% 
-    as.data.frame() %>%
-    dplyr::filter(Count >= 2)
+    as.data.frame()
   reactomeEnrichSummary <- reactomeEnrich %>% summary()
   
   qc_df <- data.frame(
@@ -298,382 +304,375 @@ AG_H1N1_predictors <- read.csv(AG_S3_T2,sep=",") %>%
 # H3N2
 
 ## Nautilus
-H3N2_predictors <- read.csv(NA_S1_T0,sep=";") %>%
+NA_H3N2_predictors <- read.csv(NA_S1_T0,sep=";") %>%
   dplyr::filter(grepl("H3N2",Ensemble)) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames()
-H3N2_predictors <- read.csv(NA_S1_T2,sep=";") %>%
+NA_H3N2_predictors <- read.csv(NA_S1_T2,sep=";") %>%
   dplyr::filter(grepl("H3N2",Ensemble)) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(NA_S2_T0,sep=";") %>%
+  rbind(NA_H3N2_predictors)
+NA_H3N2_predictors <- read.csv(NA_S2_T0,sep=";") %>%
   dplyr::filter(grepl("H3N2",Ensemble)) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(NA_S2_T2,sep=";") %>%
+  rbind(NA_H3N2_predictors)
+NA_H3N2_predictors <- read.csv(NA_S2_T2,sep=";") %>%
   dplyr::filter(grepl("H3N2",Ensemble)) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
+  rbind(NA_H3N2_predictors)
 
 ## aydin
-H3N2_predictors <- read.csv(AY_S1_T0,sep=",") %>%
+AY_H3N2_predictors <- read.csv(AY_S1_T0,sep=",") %>%
+  dplyr::filter(grepl("H3N2",VIRUS_TYPE)) %>%
+  dplyr::select(PROBE_SET_ID) %>%
+  dplyr::transmute(Predictor = PROBE_SET_ID) %>%
+  probeIDs2GeneNames()
+AY_H3N2_predictors <- read.csv(AY_S1_T2,sep=",") %>%
   dplyr::filter(grepl("H3N2",VIRUS_TYPE)) %>%
   dplyr::select(PROBE_SET_ID) %>%
   dplyr::transmute(Predictor = PROBE_SET_ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(AY_S1_T2,sep=",") %>%
+  rbind(AY_H3N2_predictors)
+AY_H3N2_predictors <- read.csv(AY_S2_T0,sep=",") %>%
   dplyr::filter(grepl("H3N2",VIRUS_TYPE)) %>%
   dplyr::select(PROBE_SET_ID) %>%
   dplyr::transmute(Predictor = PROBE_SET_ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(AY_S2_T0,sep=",") %>%
+  rbind(AY_H3N2_predictors)
+AY_H3N2_predictors <- read.csv(AY_S2_T2,sep=",") %>%
   dplyr::filter(grepl("H3N2",VIRUS_TYPE)) %>%
   dplyr::select(PROBE_SET_ID) %>%
   dplyr::transmute(Predictor = PROBE_SET_ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(AY_S2_T2,sep=",") %>%
-  dplyr::filter(grepl("H3N2",VIRUS_TYPE)) %>%
-  dplyr::select(PROBE_SET_ID) %>%
-  dplyr::transmute(Predictor = PROBE_SET_ID) %>%
-  probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(AY_S3_T0,sep=",",header = FALSE) %>%
+  rbind(AY_H3N2_predictors)
+AY_H3N2_predictors <- read.csv(AY_S3_T0,sep=",",header = FALSE) %>%
   dplyr::filter(grepl("H3N2",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(AY_S3_T2,sep=",",header = FALSE) %>%
+  rbind(AY_H3N2_predictors)
+AY_H3N2_predictors <- read.csv(AY_S3_T2,sep=",",header = FALSE) %>%
   dplyr::filter(grepl("H3N2",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
+  rbind(AY_H3N2_predictors)
 
 ## SSN_Dream_Team
-H3N2_predictors <- read.csv(SS_S1_T0,sep=",",header=FALSE) %>%
+SS_H3N2_predictors <- read.csv(SS_S1_T0,sep=",",header=FALSE) %>%
+  dplyr::filter(grepl("H3N2",V1)) %>%
+  dplyr::select(V2) %>%
+  dplyr::transmute(Predictor = V2) %>%
+  probeIDs2GeneNames()
+SS_H3N2_predictors <- read.csv(SS_S1_T2,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("H3N2",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(SS_S1_T2,sep=",",header=FALSE) %>%
+  rbind(SS_H3N2_predictors)
+SS_H3N2_predictors <- read.csv(SS_S2_T0,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("H3N2",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(SS_S2_T0,sep=",",header=FALSE) %>%
+  rbind(SS_H3N2_predictors)
+SS_H3N2_predictors <- read.csv(SS_S2_T2,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("H3N2",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(SS_S2_T2,sep=",",header=FALSE) %>%
+  rbind(SS_H3N2_predictors)
+SS_H3N2_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("H3N2",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
+  rbind(SS_H3N2_predictors)
+SS_H3N2_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("H3N2",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
-  dplyr::filter(grepl("H3N2",V1)) %>%
-  dplyr::select(V2) %>%
-  dplyr::transmute(Predictor = V2) %>%
-  probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
+  rbind(SS_H3N2_predictors)
 
 ## Txsolo
-H3N2_predictors <- read.csv(TX_S1_T0,sep=",") %>%
+TX_H3N2_predictors <- read.csv(TX_S1_T0,sep=",") %>%
+  dplyr::filter(grepl("DEE5",virus)) %>%
+  dplyr::select(feature) %>%
+  dplyr::transmute(Predictor = feature) %>%
+  unigeneIDs2GeneNames()
+TX_H3N2_predictors <- read.csv(TX_S1_T2,sep=",") %>%
   dplyr::filter(grepl("DEE5",virus)) %>%
   dplyr::select(feature) %>%
   dplyr::transmute(Predictor = feature) %>%
   unigeneIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(TX_S1_T2,sep=",") %>%
+  rbind(TX_H3N2_predictors)
+TX_H3N2_predictors <- read.csv(TX_S2_T0,sep=",") %>%
   dplyr::filter(grepl("DEE5",virus)) %>%
   dplyr::select(feature) %>%
   dplyr::transmute(Predictor = feature) %>%
   unigeneIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(TX_S2_T0,sep=",") %>%
+  rbind(TX_H3N2_predictors)
+TX_H3N2_predictors <- read.csv(TX_S2_T2,sep=",") %>%
   dplyr::filter(grepl("DEE5",virus)) %>%
   dplyr::select(feature) %>%
   dplyr::transmute(Predictor = feature) %>%
   unigeneIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(TX_S2_T2,sep=",") %>%
-  dplyr::filter(grepl("DEE5",virus)) %>%
-  dplyr::select(feature) %>%
-  dplyr::transmute(Predictor = feature) %>%
-  unigeneIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
+  rbind(TX_H3N2_predictors)
 
 ## cwruPatho
-H3N2_predictors <- read.csv(CW_S1_T0,sep=",") %>%
+CW_H3N2_predictors <- read.csv(CW_S1_T0,sep=",") %>%
+  dplyr::filter(grepl("H3N2",Virus)) %>%
+  dplyr::select(Probe.Set.ID) %>%
+  dplyr::transmute(Predictor = Probe.Set.ID) %>%
+  probeIDs2GeneNames()
+CW_H3N2_predictors <- read.csv(CW_S1_T2,sep=",") %>%
   dplyr::filter(grepl("H3N2",Virus)) %>%
   dplyr::select(Probe.Set.ID) %>%
   dplyr::transmute(Predictor = Probe.Set.ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(CW_S1_T2,sep=",") %>%
+  rbind(CW_H3N2_predictors)
+CW_H3N2_predictors <- read.csv(CW_S2_T2,sep=",") %>%
   dplyr::filter(grepl("H3N2",Virus)) %>%
   dplyr::select(Probe.Set.ID) %>%
   dplyr::transmute(Predictor = Probe.Set.ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(CW_S2_T2,sep=",") %>%
+  rbind(CW_H3N2_predictors)
+CW_H3N2_predictors <- read.csv(CW_S3_T0,sep=",") %>%
   dplyr::filter(grepl("H3N2",Virus)) %>%
   dplyr::select(Probe.Set.ID) %>%
   dplyr::transmute(Predictor = Probe.Set.ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(CW_S3_T0,sep=",") %>%
+  rbind(CW_H3N2_predictors)
+CW_H3N2_predictors <- read.csv(CW_S3_T2,sep=",") %>%
   dplyr::filter(grepl("H3N2",Virus)) %>%
   dplyr::select(Probe.Set.ID) %>%
   dplyr::transmute(Predictor = Probe.Set.ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(CW_S3_T2,sep=",") %>%
-  dplyr::filter(grepl("H3N2",Virus)) %>%
-  dplyr::select(Probe.Set.ID) %>%
-  dplyr::transmute(Predictor = Probe.Set.ID) %>%
-  probeIDs2GeneNames() %>%
-  rbind(H3N2_predictors)
+  rbind(CW_H3N2_predictors)
 
 ## Aganita
-H3N2_predictors <- read.csv(AG_S1_T0,sep=",") %>%
+AG_H3N2_predictors <- read.csv(AG_S1_T0,sep=",") %>%
+  dplyr::filter(grepl("H3N2",Study)) %>%
+  dplyr::select(Gene) %>%
+  dplyr::transmute(Predictor = Gene)
+AG_H3N2_predictors <- read.csv(AG_S1_T2,sep=",") %>%
   dplyr::filter(grepl("H3N2",Study)) %>%
   dplyr::select(Gene) %>%
   dplyr::transmute(Predictor = Gene) %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(AG_S1_T2,sep=",") %>%
+  rbind(AG_H3N2_predictors)
+AG_H3N2_predictors <- read.csv(AG_S2_T0,sep=",") %>%
   dplyr::filter(grepl("H3N2",Study)) %>%
   dplyr::select(Gene) %>%
   dplyr::transmute(Predictor = Gene) %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(AG_S2_T0,sep=",") %>%
+  rbind(AG_H3N2_predictors)
+AG_H3N2_predictors <- read.csv(AG_S2_T2,sep=",") %>%
   dplyr::filter(grepl("H3N2",Study)) %>%
   dplyr::select(Gene) %>%
   dplyr::transmute(Predictor = Gene) %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(AG_S2_T2,sep=",") %>%
+  rbind(AG_H3N2_predictors)
+AG_H3N2_predictors <- read.csv(AG_S3_T0,sep=",") %>%
   dplyr::filter(grepl("H3N2",Study)) %>%
   dplyr::select(Gene) %>%
   dplyr::transmute(Predictor = Gene) %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(AG_S3_T0,sep=",") %>%
+  rbind(AG_H3N2_predictors)
+AG_H3N2_predictors <- read.csv(AG_S3_T2,sep=",") %>%
   dplyr::filter(grepl("H3N2",Study)) %>%
   dplyr::select(Gene) %>%
   dplyr::transmute(Predictor = Gene) %>%
-  rbind(H3N2_predictors)
-H3N2_predictors <- read.csv(AG_S3_T2,sep=",") %>%
-  dplyr::filter(grepl("H3N2",Study)) %>%
-  dplyr::select(Gene) %>%
-  dplyr::transmute(Predictor = Gene) %>%
-  rbind(H3N2_predictors)
+  rbind(AG_H3N2_predictors)
 
 # Rhinovirus
 
 ## Nautilus
-Rhinovirus_predictors <- read.csv(NA_S1_T0,sep=";") %>%
+NA_Rhinovirus_predictors <- read.csv(NA_S1_T0,sep=";") %>%
   dplyr::filter(grepl("Rhinovirus",Ensemble)) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames()
-Rhinovirus_predictors <- read.csv(NA_S1_T2,sep=";") %>%
+NA_Rhinovirus_predictors <- read.csv(NA_S1_T2,sep=";") %>%
   dplyr::filter(grepl("Rhinovirus",Ensemble)) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(NA_S2_T0,sep=";") %>%
+  rbind(NA_Rhinovirus_predictors)
+NA_Rhinovirus_predictors <- read.csv(NA_S2_T0,sep=";") %>%
   dplyr::filter(grepl("Rhinovirus",Ensemble)) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(NA_S2_T2,sep=";") %>%
+  rbind(NA_Rhinovirus_predictors)
+NA_Rhinovirus_predictors <- read.csv(NA_S2_T2,sep=";") %>%
   dplyr::filter(grepl("Rhinovirus",Ensemble)) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
+  rbind(NA_Rhinovirus_predictors)
 
 ## aydin
-Rhinovirus_predictors <- read.csv(AY_S1_T0,sep=",") %>%
+AY_Rhinovirus_predictors <- read.csv(AY_S1_T0,sep=",") %>%
+  dplyr::filter(grepl("Rhinovirus",VIRUS_TYPE)) %>%
+  dplyr::select(PROBE_SET_ID) %>%
+  dplyr::transmute(Predictor = PROBE_SET_ID) %>%
+  probeIDs2GeneNames()
+AY_Rhinovirus_predictors <- read.csv(AY_S1_T2,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",VIRUS_TYPE)) %>%
   dplyr::select(PROBE_SET_ID) %>%
   dplyr::transmute(Predictor = PROBE_SET_ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(AY_S1_T2,sep=",") %>%
+  rbind(AY_Rhinovirus_predictors)
+AY_Rhinovirus_predictors <- read.csv(AY_S2_T0,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",VIRUS_TYPE)) %>%
   dplyr::select(PROBE_SET_ID) %>%
   dplyr::transmute(Predictor = PROBE_SET_ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(AY_S2_T0,sep=",") %>%
+  rbind(AY_Rhinovirus_predictors)
+AY_Rhinovirus_predictors <- read.csv(AY_S2_T2,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",VIRUS_TYPE)) %>%
   dplyr::select(PROBE_SET_ID) %>%
   dplyr::transmute(Predictor = PROBE_SET_ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(AY_S2_T2,sep=",") %>%
-  dplyr::filter(grepl("Rhinovirus",VIRUS_TYPE)) %>%
-  dplyr::select(PROBE_SET_ID) %>%
-  dplyr::transmute(Predictor = PROBE_SET_ID) %>%
-  probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(AY_S3_T0,sep=",",header = FALSE) %>%
+  rbind(AY_Rhinovirus_predictors)
+AY_Rhinovirus_predictors <- read.csv(AY_S3_T0,sep=",",header = FALSE) %>%
   dplyr::filter(grepl("Rhinovirus",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(AY_S3_T2,sep=",",header = FALSE) %>%
+  rbind(AY_Rhinovirus_predictors)
+AY_Rhinovirus_predictors <- read.csv(AY_S3_T2,sep=",",header = FALSE) %>%
   dplyr::filter(grepl("Rhinovirus",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
+  rbind(AY_Rhinovirus_predictors)
 
 ## SSN_Dream_Team
-Rhinovirus_predictors <- read.csv(SS_S1_T0,sep=",",header=FALSE) %>%
+SS_Rhinovirus_predictors <- read.csv(SS_S1_T0,sep=",",header=FALSE) %>%
+  dplyr::filter(grepl("Rhinovirus",V1)) %>%
+  dplyr::select(V2) %>%
+  dplyr::transmute(Predictor = V2) %>%
+  probeIDs2GeneNames()
+SS_Rhinovirus_predictors <- read.csv(SS_S1_T2,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("Rhinovirus",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(SS_S1_T2,sep=",",header=FALSE) %>%
+  rbind(SS_Rhinovirus_predictors)
+SS_Rhinovirus_predictors <- read.csv(SS_S2_T0,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("Rhinovirus",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(SS_S2_T0,sep=",",header=FALSE) %>%
+  rbind(SS_Rhinovirus_predictors)
+SS_Rhinovirus_predictors <- read.csv(SS_S2_T2,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("Rhinovirus",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(SS_S2_T2,sep=",",header=FALSE) %>%
+  rbind(SS_Rhinovirus_predictors)
+SS_Rhinovirus_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("Rhinovirus",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
+  rbind(SS_Rhinovirus_predictors)
+SS_Rhinovirus_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("Rhinovirus",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
-  dplyr::filter(grepl("Rhinovirus",V1)) %>%
-  dplyr::select(V2) %>%
-  dplyr::transmute(Predictor = V2) %>%
-  probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
+  rbind(SS_Rhinovirus_predictors)
 
 ## Txsolo
-Rhinovirus_predictors <- read.csv(TX_S1_T0,sep=",") %>%
+TX_Rhinovirus_predictors <- read.csv(TX_S1_T0,sep=",") %>%
+  dplyr::filter(grepl("DUKE",virus)) %>%
+  dplyr::select(feature) %>%
+  dplyr::transmute(Predictor = feature) %>%
+  unigeneIDs2GeneNames()
+TX_Rhinovirus_predictors <- read.csv(TX_S1_T2,sep=",") %>%
   dplyr::filter(grepl("DUKE",virus)) %>%
   dplyr::select(feature) %>%
   dplyr::transmute(Predictor = feature) %>%
   unigeneIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(TX_S1_T2,sep=",") %>%
+  rbind(TX_Rhinovirus_predictors)
+TX_Rhinovirus_predictors <- read.csv(TX_S2_T0,sep=",") %>%
   dplyr::filter(grepl("DUKE",virus)) %>%
   dplyr::select(feature) %>%
   dplyr::transmute(Predictor = feature) %>%
   unigeneIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(TX_S2_T0,sep=",") %>%
+  rbind(TX_Rhinovirus_predictors)
+TX_Rhinovirus_predictors <- read.csv(TX_S2_T2,sep=",") %>%
   dplyr::filter(grepl("DUKE",virus)) %>%
   dplyr::select(feature) %>%
   dplyr::transmute(Predictor = feature) %>%
   unigeneIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(TX_S2_T2,sep=",") %>%
-  dplyr::filter(grepl("DUKE",virus)) %>%
-  dplyr::select(feature) %>%
-  dplyr::transmute(Predictor = feature) %>%
-  unigeneIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
+  rbind(TX_Rhinovirus_predictors)
 
 ## cwruPatho
-Rhinovirus_predictors <- read.csv(CW_S1_T0,sep=",") %>%
+CW_Rhinovirus_predictors <- read.csv(CW_S1_T0,sep=",") %>%
+  dplyr::filter(grepl("Rhinovirus",Virus)) %>%
+  dplyr::select(Probe.Set.ID) %>%
+  dplyr::transmute(Predictor = Probe.Set.ID) %>%
+  probeIDs2GeneNames()
+CW_Rhinovirus_predictors <- read.csv(CW_S1_T2,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",Virus)) %>%
   dplyr::select(Probe.Set.ID) %>%
   dplyr::transmute(Predictor = Probe.Set.ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(CW_S1_T2,sep=",") %>%
+  rbind(CW_Rhinovirus_predictors)
+CW_Rhinovirus_predictors <- read.csv(CW_S2_T2,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",Virus)) %>%
   dplyr::select(Probe.Set.ID) %>%
   dplyr::transmute(Predictor = Probe.Set.ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(CW_S2_T2,sep=",") %>%
+  rbind(CW_Rhinovirus_predictors)
+CW_Rhinovirus_predictors <- read.csv(CW_S3_T0,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",Virus)) %>%
   dplyr::select(Probe.Set.ID) %>%
   dplyr::transmute(Predictor = Probe.Set.ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(CW_S3_T0,sep=",") %>%
+  rbind(CW_Rhinovirus_predictors)
+CW_Rhinovirus_predictors <- read.csv(CW_S3_T2,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",Virus)) %>%
   dplyr::select(Probe.Set.ID) %>%
   dplyr::transmute(Predictor = Probe.Set.ID) %>%
   probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(CW_S3_T2,sep=",") %>%
-  dplyr::filter(grepl("Rhinovirus",Virus)) %>%
-  dplyr::select(Probe.Set.ID) %>%
-  dplyr::transmute(Predictor = Probe.Set.ID) %>%
-  probeIDs2GeneNames() %>%
-  rbind(Rhinovirus_predictors)
+  rbind(CW_Rhinovirus_predictors)
 
 ## Aganita
-Rhinovirus_predictors <- read.csv(AG_S1_T0,sep=",") %>%
+AG_Rhinovirus_predictors <- read.csv(AG_S1_T0,sep=",") %>%
+  dplyr::filter(grepl("Rhinovirus",Study)) %>%
+  dplyr::select(Gene) %>%
+  dplyr::transmute(Predictor = Gene)
+AG_Rhinovirus_predictors <- read.csv(AG_S1_T2,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",Study)) %>%
   dplyr::select(Gene) %>%
   dplyr::transmute(Predictor = Gene) %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(AG_S1_T2,sep=",") %>%
+  rbind(AG_Rhinovirus_predictors)
+AG_Rhinovirus_predictors <- read.csv(AG_S2_T0,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",Study)) %>%
   dplyr::select(Gene) %>%
   dplyr::transmute(Predictor = Gene) %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(AG_S2_T0,sep=",") %>%
+  rbind(AG_Rhinovirus_predictors)
+AG_Rhinovirus_predictors <- read.csv(AG_S2_T2,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",Study)) %>%
   dplyr::select(Gene) %>%
   dplyr::transmute(Predictor = Gene) %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(AG_S2_T2,sep=",") %>%
+  rbind(AG_Rhinovirus_predictors)
+AG_Rhinovirus_predictors <- read.csv(AG_S3_T0,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",Study)) %>%
   dplyr::select(Gene) %>%
   dplyr::transmute(Predictor = Gene) %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(AG_S3_T0,sep=",") %>%
+  rbind(AG_Rhinovirus_predictors)
+AG_Rhinovirus_predictors <- read.csv(AG_S3_T2,sep=",") %>%
   dplyr::filter(grepl("Rhinovirus",Study)) %>%
   dplyr::select(Gene) %>%
   dplyr::transmute(Predictor = Gene) %>%
-  rbind(Rhinovirus_predictors)
-Rhinovirus_predictors <- read.csv(AG_S3_T2,sep=",") %>%
-  dplyr::filter(grepl("Rhinovirus",Study)) %>%
-  dplyr::select(Gene) %>%
-  dplyr::transmute(Predictor = Gene) %>%
-  rbind(Rhinovirus_predictors)
+  rbind(AG_Rhinovirus_predictors)
 
 # calculate support
+
+## H1N1
+
 NA_H1N1_predictors <- NA_H1N1_predictors[!duplicated(NA_H1N1_predictors),] %>%
   as.character() %>%
   as.data.frame() %>%
@@ -738,7 +737,7 @@ plot(res, Layout="landscape",degree=2:4, sort.by="p-value")
 
 sigResDF <- summary(res)[["Table"]] %>%
   as.data.frame() %>%
-  dplyr::filter(P.value < 0.005)
+  dplyr::filter(P.value < P_VAL_THRESH)
 
 # end from https://cran.r-project.org/web/packages/SuperExactTest/vignettes/set_html.html
 
@@ -749,62 +748,249 @@ H1N1_predictors <- sigResDF %>%
   unlist() %>%
   unique()
 
-H3N2_predictors <- H3N2_predictors %>%
-  dplyr::filter(Predictor != "NA") %>%
-  dplyr::mutate(Predictor = as.character(Predictor)) %>%
-  table() %>%
+## H3N2
+
+NA_H3N2_predictors <- NA_H3N2_predictors[!duplicated(NA_H3N2_predictors),] %>%
+  as.character() %>%
   as.data.frame() %>%
-  dplyr::transmute_(Predictor = ".",Support = "Freq") %>%
-  dplyr::mutate(Predictor = as.character(Predictor),Support = as.numeric(Support))
-
-Rhinovirus_predictors <- Rhinovirus_predictors %>%
-  dplyr::filter(Predictor != "NA") %>%
+  dplyr::transmute_(Predictor = ".") %>%
   dplyr::mutate(Predictor = as.character(Predictor)) %>%
-  table() %>%
+  dplyr::filter(Predictor != "NA")
+AY_H3N2_predictors <- AY_H3N2_predictors[!duplicated(AY_H3N2_predictors),] %>%
+  as.character() %>%
   as.data.frame() %>%
-  dplyr::transmute_(Predictor = ".",Support = "Freq") %>%
-  dplyr::mutate(Predictor = as.character(Predictor),Support = as.numeric(Support))
+  dplyr::transmute_(Predictor = ".") %>%
+  dplyr::mutate(Predictor = as.character(Predictor)) %>%
+  dplyr::filter(Predictor != "NA")
+SS_H3N2_predictors <- SS_H3N2_predictors[!duplicated(SS_H3N2_predictors),] %>%
+  as.character() %>%
+  as.data.frame() %>%
+  dplyr::transmute_(Predictor = ".") %>%
+  dplyr::mutate(Predictor = as.character(Predictor)) %>%
+  dplyr::filter(Predictor != "NA")
+TX_H3N2_predictors <- TX_H3N2_predictors[!duplicated(TX_H3N2_predictors),] %>%
+  as.character() %>%
+  as.data.frame() %>%
+  dplyr::transmute_(Predictor = ".") %>%
+  dplyr::mutate(Predictor = as.character(Predictor)) %>%
+  dplyr::filter(Predictor != "NA")
+CW_H3N2_predictors <- CW_H3N2_predictors[!duplicated(CW_H3N2_predictors),] %>%
+  as.character() %>%
+  as.data.frame() %>%
+  dplyr::transmute_(Predictor = ".") %>%
+  dplyr::mutate(Predictor = as.character(Predictor)) %>%
+  dplyr::filter(Predictor != "NA")
+AG_H3N2_predictors <- AG_H3N2_predictors[!duplicated(AG_H3N2_predictors),] %>%
+  as.character() %>%
+  as.data.frame() %>%
+  dplyr::transmute_(Predictor = ".") %>%
+  dplyr::mutate(Predictor = as.character(Predictor)) %>%
+  dplyr::filter(Predictor != "NA")
 
-H3N2_predictors %>%
-  ggplot(aes(x=reorder(Support,-Support))) + 
-  geom_bar(stat="count") +
-  geom_text(stat="count",aes(label=..count..),vjust=-1,size=3) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylim(0,9000) +
-  xlab("Gene Support (# Studies Including Gene)") +
-  ylab("Gene Count (# Genes)") +
-  ggtitle("H3N2 Predictor Support")
+list.gene.sets <- c(NA_H3N2_predictors,
+                    AY_H3N2_predictors,
+                    SS_H3N2_predictors,
+                    TX_H3N2_predictors,
+                    CW_H3N2_predictors,
+                    AG_H3N2_predictors)
 
-Rhinovirus_predictors %>%
-  ggplot(aes(x=reorder(Support,-Support))) + 
-  geom_bar(stat="count") +
-  geom_text(stat="count",aes(label=..count..),vjust=-1,size=3) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylim(0,9000) +
-  xlab("Gene Support (# Studies Including Gene)") +
-  ylab("Gene Count (# Genes)") +
-  ggtitle("Rhinovirus Predictor Support")
+names(list.gene.sets) <- c("NA","AY","SS","TX","CW","AG")
+
+# from https://cran.r-project.org/web/packages/SuperExactTest/vignettes/set_html.html
+length.gene.sets <- sapply(list.gene.sets,
+                           FUN = length)
+
+total=ENTREZ_UNIVERSE %>% length() # 24515
+
+num.expected.overlap=total*do.call(base::prod,as.list(length.gene.sets/total))
+
+sapply(0:min(length.gene.sets),function(i) SuperExactTest::dpsets(i, length.gene.sets, n=total))
+
+res=SuperExactTest::supertest(list.gene.sets, n=total)
+
+plot(res, sort.by="p-value")
+
+plot(res, Layout="landscape",degree=2:4, sort.by="p-value")
+
+sigResDF <- summary(res)[["Table"]] %>%
+  as.data.frame() %>%
+  dplyr::filter(P.value < P_VAL_THRESH)
+
+# end from https://cran.r-project.org/web/packages/SuperExactTest/vignettes/set_html.html
+
+H3N2_predictors <- sigResDF %>%
+  dplyr::select(Elements) %>%
+  .[,] %>%
+  strsplit(.,split=", ") %>%
+  unlist() %>%
+  unique()
+
+## Rhinovirus
+
+NA_Rhinovirus_predictors <- NA_Rhinovirus_predictors[!duplicated(NA_Rhinovirus_predictors),] %>%
+  as.character() %>%
+  as.data.frame() %>%
+  dplyr::transmute_(Predictor = ".") %>%
+  dplyr::mutate(Predictor = as.character(Predictor)) %>%
+  dplyr::filter(Predictor != "NA")
+AY_Rhinovirus_predictors <- AY_Rhinovirus_predictors[!duplicated(AY_Rhinovirus_predictors),] %>%
+  as.character() %>%
+  as.data.frame() %>%
+  dplyr::transmute_(Predictor = ".") %>%
+  dplyr::mutate(Predictor = as.character(Predictor)) %>%
+  dplyr::filter(Predictor != "NA")
+SS_Rhinovirus_predictors <- SS_Rhinovirus_predictors[!duplicated(SS_Rhinovirus_predictors),] %>%
+  as.character() %>%
+  as.data.frame() %>%
+  dplyr::transmute_(Predictor = ".") %>%
+  dplyr::mutate(Predictor = as.character(Predictor)) %>%
+  dplyr::filter(Predictor != "NA")
+TX_Rhinovirus_predictors <- TX_Rhinovirus_predictors[!duplicated(TX_Rhinovirus_predictors),] %>%
+  as.character() %>%
+  as.data.frame() %>%
+  dplyr::transmute_(Predictor = ".") %>%
+  dplyr::mutate(Predictor = as.character(Predictor)) %>%
+  dplyr::filter(Predictor != "NA")
+CW_Rhinovirus_predictors <- CW_Rhinovirus_predictors[!duplicated(CW_Rhinovirus_predictors),] %>%
+  as.character() %>%
+  as.data.frame() %>%
+  dplyr::transmute_(Predictor = ".") %>%
+  dplyr::mutate(Predictor = as.character(Predictor)) %>%
+  dplyr::filter(Predictor != "NA")
+AG_Rhinovirus_predictors <- AG_Rhinovirus_predictors[!duplicated(AG_Rhinovirus_predictors),] %>%
+  as.character() %>%
+  as.data.frame() %>%
+  dplyr::transmute_(Predictor = ".") %>%
+  dplyr::mutate(Predictor = as.character(Predictor)) %>%
+  dplyr::filter(Predictor != "NA")
+
+list.gene.sets <- c(NA_Rhinovirus_predictors,
+                    AY_Rhinovirus_predictors,
+                    SS_Rhinovirus_predictors,
+                    TX_Rhinovirus_predictors,
+                    CW_Rhinovirus_predictors,
+                    AG_Rhinovirus_predictors)
+
+names(list.gene.sets) <- c("NA","AY","SS","TX","CW","AG")
+
+# from https://cran.r-project.org/web/packages/SuperExactTest/vignettes/set_html.html
+length.gene.sets <- sapply(list.gene.sets,
+                           FUN = length)
+
+total=ENTREZ_UNIVERSE %>% length() # 24515
+
+num.expected.overlap=total*do.call(base::prod,as.list(length.gene.sets/total))
+
+sapply(0:min(length.gene.sets),function(i) SuperExactTest::dpsets(i, length.gene.sets, n=total))
+
+res=SuperExactTest::supertest(list.gene.sets, n=total)
+
+plot(res, sort.by="p-value")
+
+plot(res, Layout="landscape",degree=2:4, sort.by="p-value")
+
+sigResDF <- summary(res)[["Table"]] %>%
+  as.data.frame() %>%
+  dplyr::filter(P.value < P_VAL_THRESH)
+
+# end from https://cran.r-project.org/web/packages/SuperExactTest/vignettes/set_html.html
+
+Rhinovirus_predictors <- sigResDF %>%
+  dplyr::select(Elements) %>%
+  .[,] %>%
+  strsplit(.,split=", ") %>%
+  unlist() %>%
+  unique()
 
 # reactome pathway enrichment analysis
+
+## H1N1
+
 H1N1_predictors %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "pink",
-                  plot_title = "H1N1 Predictors With p-value < 0.005")
+                  plot_title = paste("H1N1 Predictors With p-value < ",P_VAL_THRESH,sep=""))
+
+## H3N2
 
 H3N2_predictors %>%
-  dplyr::filter(Support >= 3) %>%
-  dplyr::select(Predictor) %>%
-  unlist() %>%
-  as.character() %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "red",
-                  plot_title = "H3N2 Predictors Supported by Two Models or More")
+                  plot_title = paste("H3N2 Predictors With p-value <",P_VAL_THRESH,sep=""))
+
+## Rhinovirus
 
 Rhinovirus_predictors %>%
-  dplyr::filter(Support >= 3) %>%
-  dplyr::select(Predictor) %>%
-  unlist() %>%
-  as.character() %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "gold",
-                  plot_title = "Rhinovirus Predictors Supported by Two Models or More")
+                  plot_title = paste("Rhinovirus Predictors With p-value < ",P_VAL_THRESH))
+
+# Intersections
+
+H1N1_H3N2_predictors <- SuperExactTest::intersect(H1N1_predictors,
+                                                  H3N2_predictors)
+H3N2_Rhinovirus_predictors <- SuperExactTest::intersect(H3N2_predictors,
+                                                        Rhinovirus_predictors)
+H1N1_Rhinovirus_predictors <- SuperExactTest::intersect(H1N1_predictors,
+                                                        Rhinovirus_predictors)
+H1N1_H3N2_Rhinovirus_predictors <- SuperExactTest::intersect(H1N1_predictors,
+                                                             H3N2_predictors,
+                                                             Rhinovirus_predictors)
+
+VennDiagram::draw.triple.venn(area1=length(H1N1_predictors),
+                              area2=length(H3N2_predictors),
+                              area3=length(Rhinovirus_predictors),
+                              n12=length(H1N1_H3N2_predictors),
+                              n23=length(H3N2_Rhinovirus_predictors),
+                              n13=length(H1N1_H3N2_Rhinovirus_predictors),
+                              n123=length(H1N1_H3N2_Rhinovirus_predictors),
+                              fill=c("pink","red","gold"))
+
+## H1N1 H3N2
+
+H1N1_H3N2_predictors %>%
+  ReactomeBarplot(query_gene_symbols = .,
+                  bar_color = "indianred1",
+                  plot_title = paste("H1N1 & H3N2 Predictors With p-value < ",P_VAL_THRESH))
+
+## H3N2 Rhinovirus
+
+H3N2_Rhinovirus_predictors %>%
+  ReactomeBarplot(query_gene_symbols = .,
+                  bar_color = "orange",
+                  plot_title = paste("H3N2 & Rhinovirus Predictors With p-value < ",P_VAL_THRESH))
+
+## H1N1 Rhinovirus
+
+H1N1_Rhinovirus_predictors %>%
+  ReactomeBarplot(query_gene_symbols = .,
+                  bar_color = "sandybrown",
+                  plot_title = paste("H1N1 & Rhinovirus Predictors With p-value < ",P_VAL_THRESH))
+
+## H1N1 H3N2 Rhinovirus
+
+H1N1_H3N2_Rhinovirus_predictors %>%
+  ReactomeBarplot(query_gene_symbols = .,
+                  bar_color = "lightsalmon",
+                  plot_title = paste("H1N1 & H3N2 & Rhinovirus Predictors With p-value < ",P_VAL_THRESH))
+
+## H1N1 only
+
+dplyr::setdiff(H1N1_predictors,dplyr::union(H3N2_predictors,Rhinovirus_predictors)) %>%
+  ReactomeBarplot(query_gene_symbols = .,
+                  bar_color = "pink",
+                  plot_title = paste("H1N1-Only Predictors with p-value < ",P_VAL_THRESH))
+
+## H3N2 only
+
+dplyr::setdiff(H1N1_predictors,dplyr::union(H3N2_predictors,Rhinovirus_predictors)) %>%
+  ReactomeBarplot(query_gene_symbols = .,
+                  bar_color = "red",
+                  plot_title = paste("H3N2-Only Predictors with p-value < ",P_VAL_THRESH))
+
+## Rhinovirus only
+
+dplyr::setdiff(H1N1_predictors,dplyr::union(H3N2_predictors,Rhinovirus_predictors)) %>%
+  ReactomeBarplot(query_gene_symbols = .,
+                  bar_color = "gold",
+                  plot_title = paste("Rhinovirus-Only Predictors with p-value < ",P_VAL_THRESH))
