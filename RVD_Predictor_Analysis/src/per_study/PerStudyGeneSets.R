@@ -22,6 +22,8 @@ ENTREZ_UNIVERSE <- AnnotationDbi::select(hgu133a2.db,keys=ls(hgu133a2ENTREZID),c
 ENTREZ_UNIVERSE <- ENTREZ_UNIVERSE[!duplicated(ENTREZ_UNIVERSE)]
 
 DOWNLOAD_DIR <- "/home/burkhart/Software/TSAR/RVD_Predictor_Analysis/data/downloads/"
+FIGURES_DIR <- "/home/burkhart/Software/TSAR/RVD_Predictor_Analysis/src/Figs/"
+
 NA_S1_T0 <- paste(DOWNLOAD_DIR,"Subchallenge1_Nautilus_Time0_Predictors.csv",sep="")
 NA_S1_T2 <- paste(DOWNLOAD_DIR,"Subchallenge1_Nautilus_Time24_Predictors.csv",sep="")
 NA_S2_T0 <- paste(DOWNLOAD_DIR,"Subchallenge2_Nautilus_Time0_Predictors.csv",sep="")
@@ -731,9 +733,19 @@ sapply(0:min(length.gene.sets),function(i) SuperExactTest::dpsets(i, length.gene
 
 res=SuperExactTest::supertest(list.gene.sets, n=total)
 
+svg(filename=paste(FIGURES_DIR,"H1N1_Model_Intersections_(Spiral).svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 plot(res, sort.by="p-value")
+dev.off()
 
+svg(filename=paste(FIGURES_DIR,"H1N1_Model_Intersections_(Bar_Graph).svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 plot(res, Layout="landscape",degree=2:4, sort.by="p-value")
+dev.off()
 
 sigResDF <- summary(res)[["Table"]] %>%
   as.data.frame() %>%
@@ -808,9 +820,19 @@ sapply(0:min(length.gene.sets),function(i) SuperExactTest::dpsets(i, length.gene
 
 res=SuperExactTest::supertest(list.gene.sets, n=total)
 
+svg(filename=paste(FIGURES_DIR,"H3N2_Model_Intersections_(Spiral).svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 plot(res, sort.by="p-value")
+dev.off()
 
+svg(filename=paste(FIGURES_DIR,"H3N2_Model_Intersections_(Bar_Graph).svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 plot(res, Layout="landscape",degree=2:4, sort.by="p-value")
+dev.off()
 
 sigResDF <- summary(res)[["Table"]] %>%
   as.data.frame() %>%
@@ -885,9 +907,19 @@ sapply(0:min(length.gene.sets),function(i) SuperExactTest::dpsets(i, length.gene
 
 res=SuperExactTest::supertest(list.gene.sets, n=total)
 
+svg(filename=paste(FIGURES_DIR,"Rhinovirus_Model_Intersections_(Spiral).svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 plot(res, sort.by="p-value")
+dev.off()
 
+svg(filename=paste(FIGURES_DIR,"Rhinovirus_Model_Intersections_(Bar_Graph).svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 plot(res, Layout="landscape",degree=2:4, sort.by="p-value")
+dev.off()
 
 sigResDF <- summary(res)[["Table"]] %>%
   as.data.frame() %>%
@@ -905,25 +937,37 @@ Rhinovirus_predictors <- sigResDF %>%
 # reactome pathway enrichment analysis
 
 ## H1N1
-
+svg(filename=paste(FIGURES_DIR,"H1N1_Predictor_PA.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 H1N1_predictors %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "pink",
                   plot_title = paste("H1N1 Predictors With p-value < ",P_VAL_THRESH,sep=""))
+dev.off()
 
 ## H3N2
-
+svg(filename=paste(FIGURES_DIR,"H3N2_Predictor_PA.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 H3N2_predictors %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "red",
                   plot_title = paste("H3N2 Predictors With p-value <",P_VAL_THRESH,sep=""))
+dev.off()
 
 ## Rhinovirus
-
+svg(filename=paste(FIGURES_DIR,"Rhinovirus_Predictor_PA.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 Rhinovirus_predictors %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "gold",
                   plot_title = paste("Rhinovirus Predictors With p-value < ",P_VAL_THRESH))
+dev.off()
 
 # Intersections
 
@@ -936,7 +980,10 @@ H1N1_Rhinovirus_predictors <- SuperExactTest::intersect(H1N1_predictors,
 H1N1_H3N2_Rhinovirus_predictors <- SuperExactTest::intersect(H1N1_predictors,
                                                              H3N2_predictors,
                                                              Rhinovirus_predictors)
-
+svg(filename=paste(FIGURES_DIR,"PerStudyVennDiagram.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 VennDiagram::draw.triple.venn(area1=length(H1N1_predictors),
                               area2=length(H3N2_predictors),
                               area3=length(Rhinovirus_predictors),
@@ -945,52 +992,81 @@ VennDiagram::draw.triple.venn(area1=length(H1N1_predictors),
                               n13=length(H1N1_H3N2_Rhinovirus_predictors),
                               n123=length(H1N1_H3N2_Rhinovirus_predictors),
                               fill=c("pink","red","gold"))
+dev.off()
 
 ## H1N1 H3N2
-
+svg(filename=paste(FIGURES_DIR,"H1N1_H3N2_Predictor_PA.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 H1N1_H3N2_predictors %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "indianred1",
                   plot_title = paste("H1N1 & H3N2 Predictors With p-value < ",P_VAL_THRESH))
+dev.off()
 
 ## H3N2 Rhinovirus
-
+svg(filename=paste(FIGURES_DIR,"H3N2_Rhinovirus_Predictor_PA.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 H3N2_Rhinovirus_predictors %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "orange",
                   plot_title = paste("H3N2 & Rhinovirus Predictors With p-value < ",P_VAL_THRESH))
+dev.off()
 
 ## H1N1 Rhinovirus
-
+svg(filename=paste(FIGURES_DIR,"H1N1_Rhinovirus_Predictor_PA.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 H1N1_Rhinovirus_predictors %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "sandybrown",
                   plot_title = paste("H1N1 & Rhinovirus Predictors With p-value < ",P_VAL_THRESH))
+dev.off()
 
-## H1N1 H3N2 Rhinovirus
-
-H1N1_H3N2_Rhinovirus_predictors %>%
+## H1N1 H3N2 Rhinovirus (should be GPX1)
+svg(filename=paste(FIGURES_DIR,"H1N1_H3N2_Predictor_PA.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
+H1N1_H3N2_Rhinovirus_predictors %>% 
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "lightsalmon",
                   plot_title = paste("H1N1 & H3N2 & Rhinovirus Predictors With p-value < ",P_VAL_THRESH))
+dev.off()
 
 ## H1N1 only
-
+svg(filename=paste(FIGURES_DIR,"H1N1-Only_Predictor_PA.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
 dplyr::setdiff(H1N1_predictors,dplyr::union(H3N2_predictors,Rhinovirus_predictors)) %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "pink",
                   plot_title = paste("H1N1-Only Predictors with p-value < ",P_VAL_THRESH))
+dev.off()
 
 ## H3N2 only
-
-dplyr::setdiff(H1N1_predictors,dplyr::union(H3N2_predictors,Rhinovirus_predictors)) %>%
+svg(filename=paste(FIGURES_DIR,"H3N2-Only_Predictor_PA.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
+dplyr::setdiff(H3N2_predictors,dplyr::union(H1N1_predictors,Rhinovirus_predictors)) %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "red",
                   plot_title = paste("H3N2-Only Predictors with p-value < ",P_VAL_THRESH))
+dev.off()
 
 ## Rhinovirus only
-
-dplyr::setdiff(H1N1_predictors,dplyr::union(H3N2_predictors,Rhinovirus_predictors)) %>%
+svg(filename=paste(FIGURES_DIR,"Rhinovirus_Predictor_PA.svg",sep=""),
+    width=15,
+    height=15,
+    pointsize=12)
+dplyr::setdiff(Rhinovirus_predictors,dplyr::union(H1N1_predictors,H3N2_predictors)) %>%
   ReactomeBarplot(query_gene_symbols = .,
                   bar_color = "gold",
                   plot_title = paste("Rhinovirus-Only Predictors with p-value < ",P_VAL_THRESH))
+dev.off()
