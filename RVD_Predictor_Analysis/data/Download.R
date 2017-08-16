@@ -7,9 +7,9 @@
 # global variables
 SYNAPSE_PARENT_ID <- "syn7067265"
 SYNAPSE_QUERY <- paste("select * from file where file.parentId=='",SYNAPSE_PARENT_ID,"'",sep="")
-DOWNLOAD_DIR <- "/home/burkhart/Software/TSAR/RVD_Predictor_Analysis/data/downloads/"
+DOWNLOAD_DIR <- "../data/downloads/"
 MD5HASH_PATH <- paste(DOWNLOAD_DIR,"md5hash.txt",sep="")
-CFG_PATH <- "/home/burkhart/Software/TSAR/RVD_Predictor_Analysis/config/SynapseCredentials.dat"
+CFG_PATH <- "../config/SynapseCredentials.dat"
 
 if(!file.exists(MD5HASH_PATH)){
   

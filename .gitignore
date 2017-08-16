@@ -10,6 +10,7 @@ src/*.svg
 
 # hidden files
 src/.*
+*.Rhistory
 
 # lock files
 *.~lock*
