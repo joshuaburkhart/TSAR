@@ -24,8 +24,8 @@ P_VAL_THRESH = 0.005
 ENTREZ_UNIVERSE <- AnnotationDbi::select(hgu133a2.db,keys=ls(hgu133a2ENTREZID),columns="ENTREZID") %>% .[,"ENTREZID"]
 ENTREZ_UNIVERSE <- ENTREZ_UNIVERSE[!duplicated(ENTREZ_UNIVERSE)]
 
-DOWNLOAD_DIR <- "/Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/data/downloads/"
-RESULTS_DIR <- "/Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/"
+DOWNLOAD_DIR <- "../data/downloads/"
+RESULTS_DIR <- "../results/"
 FIGURES_DIR <- paste(RESULTS_DIR,"Figs/",sep="")
 XLSX_DIR <- paste(RESULTS_DIR,"ExcelFiles/",sep="")
 
@@ -100,8 +100,7 @@ ReactomeBarplot <- function(query_gene_symbols,bar_color,plot_title){
     geom_bar(stat="identity", fill=bar_color) +
     geom_text(position="stack",aes(label=round(-log10.p.value,digits=3),hjust=1.1)) +
     coord_flip() +
-    labs(x="Reactome Pathway",y="-log10(p-value)",title=plot_title) %>%
-    return()
+    labs(x="Reactome Pathway",y="-log10(p-value)",title=plot_title)
 }
 
 ## "an element is omitted if it is equal to any previous element"
