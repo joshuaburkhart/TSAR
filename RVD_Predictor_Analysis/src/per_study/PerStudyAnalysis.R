@@ -1,5 +1,5 @@
 # ---
-# title: Per Study Gene Sets
+# title: Per Study Analysis
 # author: Joshua Burkhart
 # date: Aug 10, 2017
 # ---
