@@ -1024,7 +1024,7 @@ VennDiagram::draw.triple.venn(area1=length(H1N1_predictors),
                               category = c("H1N1","H3N2","Rhinovirus"),
                               n12=length(H1N1_H3N2_predictors),
                               n23=length(H3N2_Rhinovirus_predictors),
-                              n13=length(H1N1_H3N2_Rhinovirus_predictors),
+                              n13=length(H1N1_Rhinovirus_predictors),
                               n123=length(H1N1_H3N2_Rhinovirus_predictors),
                               fill=c("pink","red","gold"))
 dev.off()
@@ -1105,3 +1105,6 @@ Rhinovirus_Only %>%
                   bar_color = "gold",
                   plot_title = paste("Rhinovirus-Only Predictors with p-value < ",P_VAL_THRESH))
 dev.off()
+
+system_command = paste("qlmanage -t -s 1000 -o ", FIGURES_DIR, " ",FIGURES_DIR,"*.svg",sep="")
+system(paste(system_command))
