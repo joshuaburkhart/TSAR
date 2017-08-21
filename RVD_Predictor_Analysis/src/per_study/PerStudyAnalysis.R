@@ -213,7 +213,7 @@ SS_H1N1_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
   rbind(SS_H1N1_predictors)
-SS_H1N1_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
+SS_H1N1_predictors <- read.csv(SS_S3_T2,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("H1N1",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
@@ -397,7 +397,7 @@ SS_H3N2_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
   rbind(SS_H3N2_predictors)
-SS_H3N2_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
+SS_H3N2_predictors <- read.csv(SS_S3_T2,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("H3N2",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%
@@ -581,7 +581,7 @@ SS_Rhinovirus_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
   dplyr::transmute(Predictor = V2) %>%
   probeIDs2GeneNames() %>%
   rbind(SS_Rhinovirus_predictors)
-SS_Rhinovirus_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
+SS_Rhinovirus_predictors <- read.csv(SS_S3_T2,sep=",",header=FALSE) %>%
   dplyr::filter(grepl("Rhinovirus",V1)) %>%
   dplyr::select(V2) %>%
   dplyr::transmute(Predictor = V2) %>%

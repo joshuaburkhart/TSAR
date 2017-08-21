@@ -5,3 +5,9 @@ Team "FLU_ATTACK" did not complete separate 0h and 24h analyses for subchallenge
 Team "StanfordViralChallenge" did not complete separate 0h and 24h analyses for subchallenge 2 or 3. Thus, their results are not included in our analysis.
 
 Team "NeoNaoned" did not complete separate 0h and 24h analyses for subchallenge 3. Thus, their results are not included in our analysis.
+
+Team "cwruPatho" did not complete separate 0h and 24h analyses for subchallenge 2. Thus, their results are not included in our timepoint analysis.
+
+Team "CGATeam" used unidentifiable predictors in their analyses. Thus, their results are not included in our analysis.
+
+Team "bw" used unidentifiable predictors in their analyses. Thus, their results are not included in our analysis.
