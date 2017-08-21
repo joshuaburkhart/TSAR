@@ -11,3 +11,9 @@ Team "cwruPatho" did not complete separate 0h and 24h analyses for subchallenge 
 Team "CGATeam" used unidentifiable predictors in their analyses. Thus, their results are not included in our analysis.
 
 Team "bw" used unidentifiable predictors in their analyses. Thus, their results are not included in our analysis.
+
+Team "SBiE_KAIST" used unidentifiable predictors in their 24h analyses. Thus, their results are not included in our analysis.
+
+Team "jdn" predictor files are in an unparsable format. Thus, their results are not included in this analysis.
+
+Team "FLU_ATTACK" predictor files are in an unparsable format. Thus, their results are not included in this analysis.

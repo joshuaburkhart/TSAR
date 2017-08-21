@@ -195,19 +195,6 @@ ER_T2_predictors <- read.csv(ER_S2_T2,header=FALSE) %>%
   probeIDs2GeneNames() %>%
   rbind(ER_T2_predictors)
  
-FA_S2_T0 <- paste(DOWNLOAD_DIR, "Subchallenge2_FLU_ATTACK_Time0_Predictors.csv",sep="")
-FA_S2_T2 <- paste(DOWNLOAD_DIR, "Subchallenge2_FLU_ATTACK_Time24_Predictors.csv",sep="")
-
-FA_T0_predictors <- read.csv(FA_S2_T0,header=TRUE) %>%
-  dplyr::transmute(Predictor = Predictors) %>%
-  dplyr::select(Predictor) %>%
-  probeIDs2GeneNames()
-
-FA_T2_predictors <- read.csv(FA_S2_T2,header=TRUE) %>%
-  dplyr::transmute(Predictor = Predictors) %>%
-  dplyr::select(Predictor) %>%
-  probeIDs2GeneNames()
-                  
 GN_S1_T0 <- paste(DOWNLOAD_DIR, "Subchallenge1_Gustavssonlab_Nordlinglab_0_Predictors.csv",sep="")
 GN_S1_T2 <- paste(DOWNLOAD_DIR, "Subchallenge1_Gustavssonlab_Nordlinglab_24_Predictors.csv",sep="")
 GN_S2_T0 <- paste(DOWNLOAD_DIR, "Subchallenge2_Gustavssonlab_Nordlinglab_0_Predictors.csv",sep="")
@@ -216,31 +203,31 @@ GN_S3_T0 <- paste(DOWNLOAD_DIR, "Subchallenge3_Gustavssonlab_Nordlinglab_0_Predi
 GN_S3_T2 <- paste(DOWNLOAD_DIR, "Subchallenge3_Gustavssonlab_Nordlinglab_24_Predictors.csv",sep="")
            
 GN_T0_predictors <- read.csv(GN_S1_T0,header=TRUE) %>%
-  dplyr::transmute(Predictor = 1) %>%
+  dplyr::transmute(Predictor = predictors_viral_shedding_0h) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames()
 GN_T0_predictors <- read.csv(GN_S2_T0,header=TRUE) %>%
-  dplyr::transmute(Predictor = 1) %>%
+  dplyr::transmute(Predictor = predictors_symptomatic_score_0h) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
   rbind(GN_T0_predictors)
 GN_T0_predictors <- read.csv(GN_S3_T0,header=TRUE) %>%
-  dplyr::transmute(Predictor = 1) %>%
+  dplyr::transmute(Predictor = predictors_logsymptomatic_0h) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
   rbind(GN_T0_predictors)
 
 GN_T2_predictors <- read.csv(GN_S1_T2,header=TRUE) %>%
-  dplyr::transmute(Predictor = 1) %>%
+  dplyr::transmute(Predictor = predictors_viral_shedding_24h) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames()
 GN_T2_predictors <- read.csv(GN_S2_T2,header=TRUE) %>%
-  dplyr::transmute(Predictor = 1) %>%
+  dplyr::transmute(Predictor = predictors_symptomatic_score_24h) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
   rbind(GN_T2_predictors)
 GN_T2_predictors <- read.csv(GN_S3_T2,header=TRUE) %>%
-  dplyr::transmute(Predictor = 1) %>%
+  dplyr::transmute(Predictor = predictors_logsymptomatic_24h) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
   rbind(GN_T2_predictors)
@@ -313,37 +300,6 @@ RC_T2_predictors <- read.csv(RC_S3_T2,header=TRUE,sep=",") %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
   rbind(RC_T2_predictors)
-      
-SK_S1_T0 <- paste(DOWNLOAD_DIR, "Subchallenge1_SBiE_KAIST_Time0_Predictors.csv",sep="")
-SK_S1_T2 <- paste(DOWNLOAD_DIR, "Subchallenge1_SBiE_KAIST_Time24_Predictors.csv",sep="")
-SK_S2_T0 <- paste(DOWNLOAD_DIR, "Subchallenge2_SBiE_KAIST_Time0_Predictors.csv",sep="")
-SK_S2_T2 <- paste(DOWNLOAD_DIR, "Subchallenge2_SBiE_KAIST_Time24_Predictors.csv",sep="")
-SK_S3_T0 <- paste(DOWNLOAD_DIR, "Subchallenge3_SBiE_KAIST_Time0_Predictors.csv",sep="")
-SK_S3_T2 <- paste(DOWNLOAD_DIR, "Subchallenge3_SBiE_KAIST_Time24_Predictors.csv",sep="")
-            
-SK_T0_predictors <- read.csv(SK_S1_T0,header=TRUE,sep=",") %>%
-  dplyr::transmute(Predictor = Predictors) %>%
-  dplyr::select(Predictor)
-SK_T0_predictors <- read.csv(SK_S2_T0,header=TRUE,sep=",") %>%
-  dplyr::transmute(Predictor = Predictors) %>%
-  dplyr::select(Predictor) %>%
-  rbind(SK_T0_predictors)
-SK_T0_predictors <- read.csv(SK_S3_T0,header=TRUE,sep=",") %>%
-  dplyr::transmute(Predictor = Predictors) %>%
-  dplyr::select(Predictor) %>%
-  rbind(SK_T0_predictors)
-
-SK_T2_predictors <- read.csv(SK_S1_T2,header=TRUE,sep=",") %>%
-  dplyr::transmute(Predictor = Predictors) %>%
-  dplyr::select(Predictor)
-SK_T2_predictors <- read.csv(SK_S2_T2,header=TRUE,sep=",") %>%
-  dplyr::transmute(Predictor = Predictors) %>%
-  dplyr::select(Predictor) %>%
-  rbind(SK_T2_predictors)
-SK_T2_predictors <- read.csv(SK_S3_T2,header=TRUE,sep=",") %>%
-  dplyr::transmute(Predictor = Predictors) %>%
-  dplyr::select(Predictor) %>%
-  rbind(SK_T2_predictors)
       
 SC_S1_T0 <- paste(DOWNLOAD_DIR, "Subchallenge1_SchrodingersCat_Time0_Predictors.csv",sep="")
 SC_S1_T2 <- paste(DOWNLOAD_DIR, "Subchallenge1_SchrodingersCat_Time24_Predictors.csv",sep="")
@@ -547,43 +503,6 @@ HV_T2_predictors <- read.csv(HV_S2_T2,header=TRUE,sep="\t") %>%
   dplyr::transmute(Predictor = predictors) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames()
-
-JD_S1_T0 <- paste(DOWNLOAD_DIR, "Subchallenge1_jdn_Time0_Predictors.csv",sep="")
-JD_S1_T2 <- paste(DOWNLOAD_DIR, "Subchallenge1_jdn_Time24_Predictors.csv",sep="")
-JD_S2_T0 <- paste(DOWNLOAD_DIR, "Subchallenge2_jdn_Time0_Predictors.csv",sep="")
-JD_S2_T2 <- paste(DOWNLOAD_DIR, "Subchallenge2_jdn_Time24_Predictors.csv",sep="")
-JD_S3_T0 <- paste(DOWNLOAD_DIR, "Subchallenge3_jdn_Time0_Predictors.csv",sep="")
-JD_S3_T2 <- paste(DOWNLOAD_DIR, "Subchallenge3_jdn_Time24_Predictors.csv",sep="")
-
-JD_T0_predictors <- read.csv(JD_S1_T0,header = TRUE) %>%
-  dplyr::transmute(Predictor = PREDICTOR) %>%
-  dplyr::select(Predictor) %>%
-  probeIDs2GeneNames()
-JD_T0_predictors <- read.csv(JD_S2_T0,header = TRUE) %>%
-  dplyr::transmute(Predictor = PREDICTOR) %>%
-  dplyr::select(Predictor) %>%
-  probeIDs2GeneNames() %>%
-  rbind(JD_T0_predictors)
-JD_T0_predictors <- read.csv(JD_S3_T0,header = TRUE) %>%
-  dplyr::transmute(Predictor = PREDICTOR) %>%
-  dplyr::select(Predictor) %>%
-  probeIDs2GeneNames() %>%
-  rbind(JD_T0_predictors)
-
-JD_T2_predictors <- read.csv(JD_S1_T2,header = TRUE) %>%
-  dplyr::transmute(Predictor = PREDICTOR) %>%
-  dplyr::select(Predictor) %>%
-  probeIDs2GeneNames()
-JD_T2_predictors <- read.csv(JD_S2_T2,header = TRUE) %>%
-  dplyr::transmute(Predictor = PREDICTOR) %>%
-  dplyr::select(Predictor) %>%
-  probeIDs2GeneNames() %>%
-  rbind(JD_T2_predictors)
-JD_T2_predictors <- read.csv(JD_S3_T2,header = TRUE) %>%
-  dplyr::transmute(Predictor = PREDICTOR) %>%
-  dplyr::select(Predictor) %>%
-  probeIDs2GeneNames() %>%
-  rbind(JD_T2_predictors)
 
 JH_S1_T0 <- paste(DOWNLOAD_DIR, "Subchallenge1_jhou_Time0_Predictors.csv",sep="")
 JH_S1_T2 <- paste(DOWNLOAD_DIR, "Subchallenge1_jhou_Time24_Predictors.csv",sep="")
@@ -895,13 +814,6 @@ RC_T0_predictors <- RC_T0_predictors[!duplicated(RC_T0_predictors),] %>%
   dplyr::mutate(Predictor = as.character(Predictor)) %>%
   dplyr::filter(Predictor != "NA")
 
-SK_T0_predictors <- SK_T0_predictors[!duplicated(SK_T0_predictors),] %>%
-  as.character() %>%
-  as.data.frame() %>%
-  dplyr::transmute_(Predictor = ".") %>%
-  dplyr::mutate(Predictor = as.character(Predictor)) %>%
-  dplyr::filter(Predictor != "NA")
-
 SC_T0_predictors <- SC_T0_predictors[!duplicated(SC_T0_predictors),] %>%
   as.character() %>%
   as.data.frame() %>%
@@ -937,21 +849,7 @@ VP_T0_predictors <- VP_T0_predictors[!duplicated(VP_T0_predictors),] %>%
   dplyr::mutate(Predictor = as.character(Predictor)) %>%
   dplyr::filter(Predictor != "NA")
 
-JD_T0_predictors <- JD_T0_predictors[!duplicated(JD_T0_predictors),] %>%
-  as.character() %>%
-  as.data.frame() %>%
-  dplyr::transmute_(Predictor = ".") %>%
-  dplyr::mutate(Predictor = as.character(Predictor)) %>%
-  dplyr::filter(Predictor != "NA")
-
 JH_T0_predictors <- JH_T0_predictors[!duplicated(JH_T0_predictors),] %>%
-  as.character() %>%
-  as.data.frame() %>%
-  dplyr::transmute_(Predictor = ".") %>%
-  dplyr::mutate(Predictor = as.character(Predictor)) %>%
-  dplyr::filter(Predictor != "NA")
-
-FA_T0_predictors <- FA_T0_predictors[!duplicated(FA_T0_predictors),] %>%
   as.character() %>%
   as.data.frame() %>%
   dplyr::transmute_(Predictor = ".") %>%
@@ -992,15 +890,12 @@ list.gene.sets <- c(NA_T0_predictors,
                     GN_T0_predictors,
                     PH_T0_predictors,
                     RC_T0_predictors,
-                    SK_T0_predictors,
                     SC_T0_predictors,
                     SH_T0_predictors,
                     SU_T0_predictors,
                     TD_T0_predictors,
                     VP_T0_predictors,
-                    JD_T0_predictors,
                     JH_T0_predictors,
-                    FA_T0_predictors,
                     JK_T0_predictors,
                     HV_T0_predictors,
                     BK_T0_predictors)
@@ -1018,15 +913,12 @@ names(list.gene.sets) <- c("NA",
                            "GN",
                            "PH",
                            "RC",
-                           "SK",
                            "SC",
                            "SH",
                            "SU",
                            "TD",
                            "VP",
-                           "JD",
                            "JH",
-                           "FA",
                            "JK",
                            "HV",
                            "BK")
@@ -1161,13 +1053,6 @@ RC_T2_predictors <- RC_T2_predictors[!duplicated(RC_T2_predictors),] %>%
   dplyr::mutate(Predictor = as.character(Predictor)) %>%
   dplyr::filter(Predictor != "NA")
 
-SK_T2_predictors <- SK_T2_predictors[!duplicated(SK_T2_predictors),] %>%
-  as.character() %>%
-  as.data.frame() %>%
-  dplyr::transmute_(Predictor = ".") %>%
-  dplyr::mutate(Predictor = as.character(Predictor)) %>%
-  dplyr::filter(Predictor != "NA")
-
 SC_T2_predictors <- SC_T2_predictors[!duplicated(SC_T2_predictors),] %>%
   as.character() %>%
   as.data.frame() %>%
@@ -1203,21 +1088,7 @@ VP_T2_predictors <- VP_T2_predictors[!duplicated(VP_T2_predictors),] %>%
   dplyr::mutate(Predictor = as.character(Predictor)) %>%
   dplyr::filter(Predictor != "NA")
 
-JD_T2_predictors <- JD_T2_predictors[!duplicated(JD_T2_predictors),] %>%
-  as.character() %>%
-  as.data.frame() %>%
-  dplyr::transmute_(Predictor = ".") %>%
-  dplyr::mutate(Predictor = as.character(Predictor)) %>%
-  dplyr::filter(Predictor != "NA")
-
 JH_T2_predictors <- JH_T2_predictors[!duplicated(JH_T2_predictors),] %>%
-  as.character() %>%
-  as.data.frame() %>%
-  dplyr::transmute_(Predictor = ".") %>%
-  dplyr::mutate(Predictor = as.character(Predictor)) %>%
-  dplyr::filter(Predictor != "NA")
-
-FA_T2_predictors <- FA_T2_predictors[!duplicated(FA_T2_predictors),] %>%
   as.character() %>%
   as.data.frame() %>%
   dplyr::transmute_(Predictor = ".") %>%
@@ -1258,15 +1129,12 @@ list.gene.sets <- c(NA_T2_predictors,
                     GN_T2_predictors,
                     PH_T2_predictors,
                     RC_T2_predictors,
-                    SK_T2_predictors,
                     SC_T2_predictors,
                     SH_T2_predictors,
                     SU_T2_predictors,
                     TD_T2_predictors,
                     VP_T2_predictors,
-                    JD_T2_predictors,
                     JH_T2_predictors,
-                    FA_T2_predictors,
                     JK_T2_predictors,
                     HV_T2_predictors,
                     BK_T2_predictors)
@@ -1284,15 +1152,12 @@ names(list.gene.sets) <- c("NA",
                            "GN",
                            "PH",
                            "RC",
-                           "SK",
                            "SC",
                            "SH",
                            "SU",
                            "TD",
                            "VP",
-                           "JD",
                            "JH",
-                           "FA",
                            "JK",
                            "HV",
                            "BK")
