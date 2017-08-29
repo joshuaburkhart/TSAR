@@ -17,3 +17,9 @@ Team "SBiE_KAIST" used unidentifiable predictors in their 24h analyses. Thus, th
 Team "jdn" predictor files are in an unparsable format. Thus, their results are not included in this analysis.
 
 Team "FLU_ATTACK" predictor files are in an unparsable format. Thus, their results are not included in this analysis.
+
+Team "RC" used all predictors
+
+Team "SC" used all predictors
+
+Team "VP" used all predictors
