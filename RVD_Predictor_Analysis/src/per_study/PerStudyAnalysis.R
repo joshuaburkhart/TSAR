@@ -12,11 +12,8 @@ library(hgu133a2.db)
 library(ReactomePA)
 library(annotate)
 library(magrittr)
-library(xlsxjars)
-library(openxlsx)
 library(ggplot2)
 library(dplyr)
-library(rJava)
 
 # gloabal variables
 P_VAL_THRESH = 0.005
@@ -27,7 +24,7 @@ ENTREZ_UNIVERSE <- ENTREZ_UNIVERSE[!duplicated(ENTREZ_UNIVERSE)]
 DOWNLOAD_DIR <- "../data/downloads/"
 RESULTS_DIR <- "../results/"
 FIGURES_DIR <- paste(RESULTS_DIR,"Figs/",sep="")
-XLSX_DIR <- paste(RESULTS_DIR,"ExcelFiles/",sep="")
+GENELIST_DIR <- paste(RESULTS_DIR,"GeneLists/",sep="")
 
 NA_S1_T0 <- paste(DOWNLOAD_DIR,"Subchallenge1_Nautilus_Time0_Predictors.csv",sep="")
 NA_S1_T2 <- paste(DOWNLOAD_DIR,"Subchallenge1_Nautilus_Time24_Predictors.csv",sep="")
@@ -943,7 +940,7 @@ Rhinovirus_predictors <- sigResDF %>%
 ## H1N1
 title <- paste("H1N1 Predictors With p-value < ",P_VAL_THRESH,sep="")
 H1N1_predictors %>%
-  write.xlsx(paste(XLSX_DIR,"H1N1_Predictors.xlsx",sep=""))
+  write(paste(GENELIST_DIR,"H1N1_Predictors.txt",sep=""))
 svg(filename=paste(FIGURES_DIR,"H1N1_Predictor_PA.svg",sep=""),
     width=15,
     height=15,
@@ -957,7 +954,7 @@ dev.off()
 ## H3N2
 title <- paste("H3N2 Predictors With p-value < ",P_VAL_THRESH,sep="")
 H3N2_predictors %>%
-  write.xlsx(paste(XLSX_DIR,"H3N2_Predictors.xlsx",sep=""))
+  write(paste(GENELIST_DIR,"H3N2_Predictors.txt",sep=""))
 svg(filename=paste(FIGURES_DIR,"H3N2_Predictor_PA.svg",sep=""),
     width=15,
     height=15,
@@ -971,7 +968,7 @@ dev.off()
 ## Rhinovirus
 title <- paste("Rhinovirus Predictors With p-value < ",P_VAL_THRESH)
 Rhinovirus_predictors %>%
-  write.xlsx(paste(XLSX_DIR,"Rhinovirus_Predictors.xlsx",sep=""))
+  write(paste(GENELIST_DIR,"Rhinovirus_Predictors.txt",sep=""))
 svg(filename=paste(FIGURES_DIR,"Rhinovirus_Predictor_PA.svg",sep=""),
     width=15,
     height=15,
@@ -987,32 +984,32 @@ dev.off()
 H1N1_H3N2_predictors <- SuperExactTest::intersect(H1N1_predictors,
                                                   H3N2_predictors)
 H1N1_H3N2_predictors %>%
-  write.xlsx(paste(XLSX_DIR,"H1N1_H3N2_Intersection.xlsx",sep=""))
+  write(paste(GENELIST_DIR,"H1N1_H3N2_Intersection.txt",sep=""))
 H3N2_Rhinovirus_predictors <- SuperExactTest::intersect(H3N2_predictors,
                                                         Rhinovirus_predictors)
 H3N2_Rhinovirus_predictors %>%
-  write.xlsx(paste(XLSX_DIR,"H3N2_Rhinovirus_Intersection.xlsx",sep=""))
+  write(paste(GENELIST_DIR,"H3N2_Rhinovirus_Intersection.txt",sep=""))
 H1N1_Rhinovirus_predictors <- SuperExactTest::intersect(H1N1_predictors,
                                                         Rhinovirus_predictors)
 H1N1_Rhinovirus_predictors %>%
-  write.xlsx(paste(XLSX_DIR,"H1N1_Rhinovirus_Intersection.xlsx",sep=""))
+  write(paste(GENELIST_DIR,"H1N1_Rhinovirus_Intersection.txt",sep=""))
 H1N1_H3N2_Rhinovirus_predictors <- SuperExactTest::intersect(H1N1_predictors,
                                                              H3N2_predictors,
                                                              Rhinovirus_predictors)
 H1N1_H3N2_Rhinovirus_predictors %>%
-  write.xlsx(paste(XLSX_DIR,"H1N1_H3N2_Rhinovirus_Intersection.xlsx",sep=""))
+  write(paste(GENELIST_DIR,"H1N1_H3N2_Rhinovirus_Intersection.txt",sep=""))
 
 H1N1_Only <- dplyr::setdiff(H1N1_predictors,dplyr::union(H3N2_predictors,Rhinovirus_predictors))
 H1N1_Only %>%
-  write.xlsx(paste(XLSX_DIR,"H1N1_Only.xlsx",sep=""))
+  write(paste(GENELIST_DIR,"H1N1_Only.txt",sep=""))
 
 H3N2_Only <- dplyr::setdiff(H3N2_predictors,dplyr::union(H1N1_predictors,Rhinovirus_predictors))
 H3N2_Only %>%
-  write.xlsx(paste(XLSX_DIR,"H3N2_Only.xlsx",sep=""))
+  write(paste(GENELIST_DIR,"H3N2_Only.txt",sep=""))
 
 Rhinovirus_Only <- dplyr::setdiff(Rhinovirus_predictors,dplyr::union(H1N1_predictors,H3N2_predictors))
 Rhinovirus_Only %>%
-  write.xlsx(paste(XLSX_DIR,"Rhinovirus_Only.xlsx",sep=""))
+  write(paste(GENELIST_DIR,"Rhinovirus_Only.txt",sep=""))
 
 svg(filename=paste(FIGURES_DIR,"PerStudyVennDiagram.svg",sep=""),
     width=15,

@@ -8,16 +8,6 @@
 source("../data/Download.R")
 
 # calculate genesets
-source("./per_study/PerStudyGeneSets.R")
-source("./per_subchallenge/PerSubchallengeGeneSets.R")
-source("./per_timepoint/PerTimepointGeneSets.R")
-
-# generate heatmaps
-source("./per_study/PerStudyHeatmap.R")
-source("./per_subchallenge/PerSubchallengeHeatmap.R")
-source("./per_timepoint/PerTimepointHeatmap.R")
-
-# perform pathway analysis
-source("./per_study/PerStudyPA.R")
-source("./per_subchallenge/PerSubchallengePA.R")
-source("./per_timepoint/PerTimepointPA.R")
+source("./per_study/PerStudyAnalysis.R")
+source("./per_timepoint/PerTimepointAnalysis.R")
+source("./per_subchallenge/PerSubchallengeAnalysis.R")
