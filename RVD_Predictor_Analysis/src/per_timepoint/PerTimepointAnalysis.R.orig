@@ -195,6 +195,16 @@ JK_T2_predictors <- read.csv(JK_S3_T2,header=TRUE,sep=",") %>%
   probeIDs2GeneNames() %>%
   rbind(JK_T2_predictors)
       
+<<<<<<< HEAD
+PH_S1_T0 <- paste(DOWNLOAD_DIR, "Subchallenge1_PrecisionHunter_Time0_Predictors.csv",sep="")
+PH_S1_T2 <- paste(DOWNLOAD_DIR, "Subchallenge1_PrecisionHunter_Time24_Predictors.csv",sep="")
+            
+PH_T0_predictors <- read.csv(PH_S1_T0,header=TRUE,sep=",") %>%
+  dplyr::select(Predictor)
+
+PH_T2_predictors <- read.csv(PH_S1_T2,header=TRUE,sep=",") %>%
+  dplyr::select(Predictor)
+=======
 RC_S2_T0 <- paste(DOWNLOAD_DIR, "Subchallenge2_Rchow_Time0_Predictors.csv",sep="")
 RC_S2_T2 <- paste(DOWNLOAD_DIR, "Subchallenge2_Rchow_Time24_Predictors.csv",sep="")
 RC_S3_T0 <- paste(DOWNLOAD_DIR, "Subchallenge3_Rchow_Time0_Predictors.csv",sep="")
@@ -244,6 +254,7 @@ SC_T2_predictors <- read.csv(SC_S3_T2,header=TRUE) %>%
   dplyr::select(Predictor) %>%
   probeIDs2GeneNames() %>%
   rbind(SC_T2_predictors)
+>>>>>>> 431f382e9eabe4ec92996a852ea2e430e3a5077d
 
 SH_S2_T0 <- paste(DOWNLOAD_DIR, "Subchallenge2_Shosty_UpToHour0_Predictors.csv",sep="")
 SH_S2_T2 <- paste(DOWNLOAD_DIR, "Subchallenge2_Shosty_UpToHour24_Predictors.csv",sep="")
@@ -316,6 +327,8 @@ TD_T2_predictors <- read.csv(TD_S3_T2,header=TRUE,sep=",") %>%
   probeIDs2GeneNames() %>%
   rbind(TD_T2_predictors)
 
+<<<<<<< HEAD
+=======
 VP_S2_T0 <- paste(DOWNLOAD_DIR, "Subchallenge2_ViResPred_Time0_Predictors.csv",sep="")
 VP_S2_T2 <- paste(DOWNLOAD_DIR, "Subchallenge2_ViResPred_Time24_Predictors.csv",sep="")
 VP_S3_T0 <- paste(DOWNLOAD_DIR, "Subchallenge3_ViResPred_Time0_Predictors.csv",sep="")
@@ -341,6 +354,7 @@ VP_T2_predictors <- read.csv(VP_S3_T2,header = FALSE,sep=",") %>%
   probeIDs2GeneNames() %>%
   rbind(VP_T2_predictors)
 
+>>>>>>> 431f382e9eabe4ec92996a852ea2e430e3a5077d
 BK_S3_T0 <- paste(DOWNLOAD_DIR, "Subchallenge3_burkhajo_Time0_Predictors.csv",sep="")
 BK_S3_T2 <- paste(DOWNLOAD_DIR, "Subchallenge3_burkhajo_Time24_Predictors.csv",sep="")
 
@@ -586,7 +600,10 @@ GN_T0_predictors <- GN_T0_predictors[!duplicated(GN_T0_predictors),] %>%
   dplyr::mutate(Predictor = as.character(Predictor)) %>%
   dplyr::filter(Predictor != "NA")
 
+<<<<<<< HEAD
 PH_T0_predictors <- PH_T0_predictors[!duplicated(PH_T0_predictors),] %>%
+=======
+RC_T0_predictors <- RC_T0_predictors[!duplicated(RC_T0_predictors),] %>%
   as.character() %>%
   as.data.frame() %>%
   dplyr::transmute_(Predictor = ".") %>%
@@ -594,6 +611,7 @@ PH_T0_predictors <- PH_T0_predictors[!duplicated(PH_T0_predictors),] %>%
   dplyr::filter(Predictor != "NA")
 
 SC_T0_predictors <- SC_T0_predictors[!duplicated(SC_T0_predictors),] %>%
+>>>>>>> 431f382e9eabe4ec92996a852ea2e430e3a5077d
   as.character() %>%
   as.data.frame() %>%
   dplyr::transmute_(Predictor = ".") %>%
@@ -615,13 +633,6 @@ SU_T0_predictors <- SU_T0_predictors[!duplicated(SU_T0_predictors),] %>%
   dplyr::filter(Predictor != "NA")
 
 TD_T0_predictors <- TD_T0_predictors[!duplicated(TD_T0_predictors),] %>%
-  as.character() %>%
-  as.data.frame() %>%
-  dplyr::transmute_(Predictor = ".") %>%
-  dplyr::mutate(Predictor = as.character(Predictor)) %>%
-  dplyr::filter(Predictor != "NA")
-
-VP_T0_predictors <- VP_T0_predictors[!duplicated(VP_T0_predictors),] %>%
   as.character() %>%
   as.data.frame() %>%
   dplyr::transmute_(Predictor = ".") %>%
@@ -665,6 +676,17 @@ list.gene.sets <- c(#NA_T0_predictors,
                     #CT_T0_predictors,
                     #CF_T0_predictors,
                     ES_T0_predictors,
+<<<<<<< HEAD
+                    ER_T0_predictors,
+                    GN_T0_predictors,
+                    PH_T0_predictors,
+                    SH_T0_predictors,
+                    SU_T0_predictors,
+                    TD_T0_predictors,
+                    JH_T0_predictors,
+                    JK_T0_predictors,
+                    HV_T0_predictors,
+=======
                     #ER_T0_predictors,
                     #GN_T0_predictors,
                     #RC_T0_predictors,
@@ -676,6 +698,7 @@ list.gene.sets <- c(#NA_T0_predictors,
                     #JH_T0_predictors,
                     #JK_T0_predictors,
                     #HV_T0_predictors,
+>>>>>>> 431f382e9eabe4ec92996a852ea2e430e3a5077d
                     BK_T0_predictors)
 
 names(list.gene.sets) <- c(#"NA",
@@ -687,6 +710,17 @@ names(list.gene.sets) <- c(#"NA",
                            #"CT",
                            #"CF",
                            "ES",
+<<<<<<< HEAD
+                           "ER",
+                           "GN",
+                           "PH",
+                           "SH",
+                           "SU",
+                           "TD",
+                           "JH",
+                           "JK",
+                           "HV",
+=======
                            #"ER",
                            #"GN",
                            #"RC",
@@ -698,6 +732,7 @@ names(list.gene.sets) <- c(#"NA",
                            #"JH",
                            #"JK",
                            #"HV",
+>>>>>>> 431f382e9eabe4ec92996a852ea2e430e3a5077d
                            "BK")
 
 # from https://cran.r-project.org/web/packages/SuperExactTest/vignettes/set_html.html
@@ -816,7 +851,10 @@ GN_T2_predictors <- GN_T2_predictors[!duplicated(GN_T2_predictors),] %>%
   dplyr::mutate(Predictor = as.character(Predictor)) %>%
   dplyr::filter(Predictor != "NA")
 
+<<<<<<< HEAD
 PH_T2_predictors <- PH_T2_predictors[!duplicated(PH_T2_predictors),] %>%
+=======
+RC_T2_predictors <- RC_T2_predictors[!duplicated(RC_T2_predictors),] %>%
   as.character() %>%
   as.data.frame() %>%
   dplyr::transmute_(Predictor = ".") %>%
@@ -824,6 +862,7 @@ PH_T2_predictors <- PH_T2_predictors[!duplicated(PH_T2_predictors),] %>%
   dplyr::filter(Predictor != "NA")
 
 SC_T2_predictors <- SC_T2_predictors[!duplicated(SC_T2_predictors),] %>%
+>>>>>>> 431f382e9eabe4ec92996a852ea2e430e3a5077d
   as.character() %>%
   as.data.frame() %>%
   dplyr::transmute_(Predictor = ".") %>%
@@ -845,13 +884,6 @@ SU_T2_predictors <- SU_T2_predictors[!duplicated(SU_T2_predictors),] %>%
   dplyr::filter(Predictor != "NA")
 
 TD_T2_predictors <- TD_T2_predictors[!duplicated(TD_T2_predictors),] %>%
-  as.character() %>%
-  as.data.frame() %>%
-  dplyr::transmute_(Predictor = ".") %>%
-  dplyr::mutate(Predictor = as.character(Predictor)) %>%
-  dplyr::filter(Predictor != "NA")
-
-VP_T2_predictors <- VP_T2_predictors[!duplicated(VP_T2_predictors),] %>%
   as.character() %>%
   as.data.frame() %>%
   dplyr::transmute_(Predictor = ".") %>%
@@ -895,6 +927,17 @@ list.gene.sets <- c(#NA_T2_predictors,
                     #CT_T2_predictors,
                     #CF_T2_predictors,
                     ES_T2_predictors,
+<<<<<<< HEAD
+                    ER_T2_predictors,
+                    GN_T2_predictors,
+                    PH_T2_predictors,
+                    SH_T2_predictors,
+                    SU_T2_predictors,
+                    TD_T2_predictors,
+                    JH_T2_predictors,
+                    JK_T2_predictors,
+                    HV_T2_predictors,
+=======
                     #ER_T2_predictors,
                     #GN_T2_predictors,
                     #RC_T2_predictors, #all predictors
@@ -906,6 +949,7 @@ list.gene.sets <- c(#NA_T2_predictors,
                     #JH_T2_predictors,
                     #JK_T2_predictors,
                     #HV_T2_predictors,
+>>>>>>> 431f382e9eabe4ec92996a852ea2e430e3a5077d
                     BK_T2_predictors)
 
 names(list.gene.sets) <- c(#"NA",
@@ -917,6 +961,17 @@ names(list.gene.sets) <- c(#"NA",
                            #"CT",
                            #"CF",
                            "ES",
+<<<<<<< HEAD
+                           "ER",
+                           "GN",
+                           "PH",
+                           "SH",
+                           "SU",
+                           "TD",
+                           "JH",
+                           "JK",
+                           "HV",
+=======
                            #"ER",
                            #"GN",
                            #"RC",
@@ -928,6 +983,7 @@ names(list.gene.sets) <- c(#"NA",
                            #"JH",
                            #"JK",
                            #"HV",
+>>>>>>> 431f382e9eabe4ec92996a852ea2e430e3a5077d
                            "BK")
 
 # from https://cran.r-project.org/web/packages/SuperExactTest/vignettes/set_html.html
