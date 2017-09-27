@@ -57,6 +57,7 @@ AG_S3_T2 <- paste(DOWNLOAD_DIR,"Subchallenge3_Aganita_Time24_Predictors.csv",sep
 # helper functions
 ReactomeBarplot <- function(query_gene_symbols,bar_color,plot_title){
   
+  if(length(query_gene_symbols) > 0){
   entrez_query <- AnnotationDbi::select(org.Hs.eg.db, query_gene_symbols, "ENTREZID", "SYMBOL")
   
   entrez_query <- entrez_query[!duplicated(entrez_query[,1]), 2]
@@ -86,6 +87,7 @@ ReactomeBarplot <- function(query_gene_symbols,bar_color,plot_title){
     geom_text(position="stack",aes(label=round(-log10.p.value,digits=3),hjust=1.1)) +
     coord_flip() +
     labs(x="Reactome Pathway",y="-log10(p-value)",title=plot_title)
+  }
 }
 
 ## "an element is omitted if it is equal to any previous element"
