@@ -11,6 +11,7 @@ source("../data/Download.R")
 ## all predictor lists from teams that separated predictors by virus
 ## including teams who only participated in subchallenge 1
 source("./per_study/PerStudyAnalysis.R")
+source("./per_study/PerStudyAnalysis_WithoutSC1.R")
 
 ## all predictor lists from teams that had both timepoints from at least
 ## one of the challenges with significant results (sub2 and sub3) with
