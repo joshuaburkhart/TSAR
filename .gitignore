@@ -1,3 +1,6 @@
+# ignore copywritten lit
+data/*.pdf
+
 # ignore generated pdfs
 src/*.pdf
 src/Figs/*.pdf
