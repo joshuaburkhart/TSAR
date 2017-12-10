@@ -1,5 +1,5 @@
 # ignore copywritten lit
-data/*.pdf
+RVD_Predictor_Analysis/data/*.pdf
 
 # ignore generated pdfs
 src/*.pdf
