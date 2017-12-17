@@ -1,0 +1,183 @@
+
+library(magrittr)
+library(ggplot2)
+library(dplyr)
+library(memisc)
+library(cowplot)
+
+# Assume working directory matches source file location
+# R Studio: Session->Set Working Directory->To Source File Location
+#setwd("/media/burkhart/Media/Software/TSAR/src")
+DATA_DIR <- "/media/burkhart/Media/Research/USB_TRANSFER/McWeeney/TSAR/"
+TRAIN_SYMPTOM <- paste(DATA_DIR,"ViralChallenge_training_SymptomScoresByDay.tsv",sep="")
+TRAIN_CLINICL <- paste(DATA_DIR,"ViralChallenge_training_CLINICAL.tsv",sep="")
+PHAS1_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase1_CLINICAL.tsv",sep="")
+PHAS2_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase2_CLINICAL.tsv",sep="")
+PHAS3_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase3_CLINICAL.tsv",sep="")
+  
+train_symptom_df <- read.table(TRAIN_SYMPTOM,header=T,sep="\t")
+train_clinicl_df <- read.table(TRAIN_CLINICL,header=T,sep="\t")
+phas1_clinicl_df <- read.table(PHAS1_CLINICL,header=T,sep="\t")
+phas2_clinicl_df <- read.table(PHAS2_CLINICL,header=T,sep="\t")
+phas3_clinicl_df <- read.table(PHAS3_CLINICL,header=T,sep="\t")
+
+### Scan for Missing Data
+
+sum(is.na(train_symptom_df)) #0
+sum(is.na(train_clinicl_df)) #4318
+sum(is.na(phas1_clinicl_df)) #60
+sum(is.na(phas2_clinicl_df)) #88
+sum(is.na(phas3_clinicl_df)) #62
+
+### Fix Missing Data
+
+#### Training Clinical Data
+train_clinicl_df %>% str()
+train_clinicl_df %>% summary()
+train_clinicl_df <- train_clinicl_df %>%
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+train_clinicl_df <- train_clinicl_df %>% 
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+
+#### Phase 1 Clinical Data
+phas1_clinicl_df %>% str()
+phas1_clinicl_df <- phas1_clinicl_df %>% 
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+phas1_clinicl_df <- phas1_clinicl_df %>% 
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+
+#### Phase 2 Clinical Data
+phas2_clinicl_df %>% str()
+phas2_clinicl_df <- phas2_clinicl_df %>%
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+phas2_clinicl_df <- phas2_clinicl_df %>%
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+
+#### Phase 3 Clinical Data
+phas3_clinicl_df %>% str()
+phas3_clinicl_df <- phas3_clinicl_df %>%
+  dplyr::mutate(EARLYTX = ifelse(is.na(EARLYTX),0,1))
+phas3_clinicl_df <- phas3_clinicl_df %>% 
+  dplyr::mutate(SHAM = ifelse(is.na(SHAM),0,1))
+
+### Checking Distributions
+#### Symptoms
+# By Virus and Day
+
+# RSV
+  train_symptom_df.s <- train_symptom_df %>% 
+    dplyr::filter(STUDYID %>% as.character() == "DEE1 RSV")
+train_symptom_df.m <- reshape2::melt(train_symptom_df.s[,c('STUDYDAY',
+                               'SX_RUNNYNOSE',
+                               'SX_COUGH',
+                               'SX_HEADACHE',
+                               'SX_MALAISE',
+                               'SX_MYALGIA',
+                               'SX_SNEEZE',
+                               'SX_SORETHROAT',
+                               'SX_STUFFYNOSE')],
+                               id.vars = 'STUDYDAY')
+
+plot.rsv <- train_symptom_df.m %>%
+  dplyr::arrange(value) %>%
+  ggplot(aes(x = STUDYDAY,y = value,fill=variable)) + 
+  geom_bar(stat="identity",position="stack") +
+  coord_cartesian(ylim=c(0,100),xlim=c(-3,8)) +
+  geom_vline(xintercept=0) +
+  geom_vline(xintercept=1) +
+  labs(x="Study Day",
+       y="Symptom Severity Counts",
+       title=paste("RSV",": Symptom Severity Counts Vertically Arranged\n
+                   by Severity and Horizontally Arranged by Study Day",sep="")) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# H1N1
+  train_symptom_df.s <- train_symptom_df %>% 
+    dplyr::filter(STUDYID %>% as.character() %in%
+                    c("DEE3 H1N1",
+                      "DEE4X H1N1"))
+train_symptom_df.m <- reshape2::melt(train_symptom_df.s[,c('STUDYDAY',
+                               'SX_RUNNYNOSE',
+                               'SX_COUGH',
+                               'SX_HEADACHE',
+                               'SX_MALAISE',
+                               'SX_MYALGIA',
+                               'SX_SNEEZE',
+                               'SX_SORETHROAT',
+                               'SX_STUFFYNOSE')],
+                               id.vars = 'STUDYDAY')
+
+plot.h1n1 <- train_symptom_df.m %>%
+  dplyr::arrange(value) %>%
+  ggplot(aes(x = STUDYDAY,y = value,fill=variable)) + 
+  geom_bar(stat="identity",position="stack") +
+  coord_cartesian(ylim=c(0,100),xlim=c(-3,8)) +
+  geom_vline(xintercept=0) +
+  geom_vline(xintercept=1) +
+  labs(x="Study Day",
+       y="Symptom Severity Counts",
+       title=paste("H1N1",": Symptom Severity Counts Vertically Arranged\n
+                   by Severity and Horizontally Arranged by Study Day",sep="")) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# H3N2
+  train_symptom_df.s <- train_symptom_df %>% 
+    dplyr::filter(STUDYID %>% as.character() %in%
+                    c("DEE2 H3N2",
+                      "DEE5 H3N2"))
+train_symptom_df.m <- reshape2::melt(train_symptom_df.s[,c('STUDYDAY',
+                               'SX_RUNNYNOSE',
+                               'SX_COUGH',
+                               'SX_HEADACHE',
+                               'SX_MALAISE',
+                               'SX_MYALGIA',
+                               'SX_SNEEZE',
+                               'SX_SORETHROAT',
+                               'SX_STUFFYNOSE')],
+                               id.vars = 'STUDYDAY')
+
+plot.h3n2 <- train_symptom_df.m %>%
+  dplyr::arrange(value) %>%
+  ggplot(aes(x = STUDYDAY,y = value,fill=variable)) + 
+  geom_bar(stat="identity",position="stack") +
+  coord_cartesian(ylim=c(0,100),xlim=c(-3,8)) +
+  geom_vline(xintercept=0) +
+  geom_vline(xintercept=1) +
+  labs(x="Study Day",
+       y="Symptom Severity Counts",
+       title=paste("H3N2",": Symptom Severity Counts Vertically Arranged\n
+                   by Severity and Horizontally Arranged by Study Day",sep="")) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Rhinovirus
+  train_symptom_df.s <- train_symptom_df %>% 
+    dplyr::filter(STUDYID %>% as.character() %in%
+                    c("Rhinovirus Duke",
+                      "Rhinovirus UVA"))
+train_symptom_df.m <- reshape2::melt(train_symptom_df.s[,c('STUDYDAY',
+                               'SX_RUNNYNOSE',
+                               'SX_COUGH',
+                               'SX_HEADACHE',
+                               'SX_MALAISE',
+                               'SX_MYALGIA',
+                               'SX_SNEEZE',
+                               'SX_SORETHROAT',
+                               'SX_STUFFYNOSE')],
+                               id.vars = 'STUDYDAY')
+
+plot.rhinovirus <- train_symptom_df.m %>%
+  dplyr::arrange(value) %>%
+  ggplot(aes(x = STUDYDAY,y = value,fill=variable)) + 
+  geom_bar(stat="identity",position="stack") +
+  coord_cartesian(ylim=c(0,100),xlim=c(-3,8)) +
+  geom_vline(xintercept=0) +
+  geom_vline(xintercept=1) +
+  labs(x="Study Day",
+       y="Symptom Severity Counts",
+       title=paste("Rhinovirus",": Symptom Severity Counts Vertically Arranged\n
+                   by Severity and Horizontally Arranged by Study Day",sep="")) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+plot_grid(plot.rhinovirus,plot.h1n1,plot.h3n2,labels="AUTO",ncol=1,align='v')
+
+

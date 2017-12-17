@@ -31,7 +31,7 @@ library(memisc)
 # Assume working directory matches source file location
 # R Studio: Session->Set Working Directory->To Source File Location
 #setwd("/media/burkhart/Media/Software/TSAR/src")
-DATA_DIR <- "/media/burkhart/D052-7853/McWeeney/TSAR/"
+DATA_DIR <- "/media/burkhart/Media/Research/USB_TRANSFER/McWeeney/TSAR/"
 TRAIN_SYMPTOM <- paste(DATA_DIR,"ViralChallenge_training_SymptomScoresByDay.tsv",sep="")
 TRAIN_CLINICL <- paste(DATA_DIR,"ViralChallenge_training_CLINICAL.tsv",sep="")
 PHAS1_CLINICL <- paste(DATA_DIR,"ViralChallenge_test_Phase1_CLINICAL.tsv",sep="")
