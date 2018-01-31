@@ -1,3 +1,0 @@
-HLA-DOB
-HLA-DQA1
-SRR

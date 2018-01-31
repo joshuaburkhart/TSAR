@@ -1,0 +1,110 @@
+TIME0_predictors.csv,Analysis of gene-expression profiles by oligonucleotide microarray in children with influenza.  - Sheet1.csv,Fig.1..acute.phase.influenza.virus.infection.
+TIME0_predictors.csv,Analysis of gene-expression profiles by oligonucleotide microarray in children with influenza.  - Sheet1.csv,Table.1..febrile.convulsion.
+TIME0_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,A
+TIME0_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,B ARHGEF12 CA1 EPB42 FECH KLF1 OSBP2 SNCA TNS1 TSPAN5 XK
+TIME0_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,C
+TIME0_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,D
+TIME0_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,E TNFAIP6 TNFSF10 RTP4
+TIME0_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,F
+TIME0_predictors.csv,Bioinf.csv,WO.Baseline H1F0 ADM MAP7
+TIME0_predictors.csv,Bioinf.csv,W.Baseline H1F0
+TIME0_predictors.csv,BMC.csv,Combined
+TIME0_predictors.csv,DavenportEE_2015_JMolMed.FigS3.processed.csv,original.symbol RTP4
+TIME0_predictors.csv,DavenportEE_2015_JMolMed.FigS3.processed.csv,symbol RTP4
+TIME0_predictors.csv,DavenportEE_2015_JMolMed.FigS3.processed.csv,gene_id
+TIME0_predictors.csv,DavenportEE_2015_JMolMed.TableS3.processed.csv,original.symbol TOP1 ADM FFAR2 TNFAIP6 CDKN1A LYN TNFSF10 P2RX7 MEFV OSM RTP4 IL1B MAFB PLAUR
+TIME0_predictors.csv,DavenportEE_2015_JMolMed.TableS3.processed.csv,symbol TOP1 ADM FFAR2 TNFAIP6 CDKN1A LYN TNFSF10 P2RX7 MEFV OSM RTP4 IL1B MAFB PLAUR
+TIME0_predictors.csv,DavenportEE_2015_JMolMed.TableS3.processed.csv,gene_id
+TIME0_predictors.csv,JASA.csv,Principal.Response TNFAIP6 TNFSF10 RTP4
+TIME0_predictors.csv,JASA.csv,X TNFAIP6 TNFSF10 RTP4
+TIME0_predictors.csv,JASA.csv,Secondary.Response
+TIME0_predictors.csv,JASA.csv,X.1
+TIME0_predictors.csv,JASA.csv,Gender.Factor ACP5 HBZ CLEC5A TMEM176A TMEM176B
+TIME0_predictors.csv,JASA.csv,X.2 HBZ IL18RAP TMEM158 TMEM176A PLVAP
+TIME0_predictors.csv,McClainMT_2016_OpenForumInfectDis.SupplementalTable2.processed.csv,original.symbol TNFAIP6 TNFSF10 RTP4
+TIME0_predictors.csv,McClainMT_2016_OpenForumInfectDis.SupplementalTable2.processed.csv,symbol TNFAIP6 TNFSF10 RTP4
+TIME0_predictors.csv,McClainMT_2016_OpenForumInfectDis.SupplementalTable2.processed.csv,gene_id
+TIME0_predictors.csv,MullerJ_2017_JTranslMed.TableS3.processed.csv,original.symbol
+TIME0_predictors.csv,MullerJ_2017_JTranslMed.TableS3.processed.csv,symbol
+TIME0_predictors.csv,MullerJ_2017_JTranslMed.TableS3.processed.csv,gene_id
+TIME0_predictors.csv,OF.csv,Current.Signature TNFAIP6 TNFSF10 RTP4
+TIME0_predictors.csv,PG.csv,X1vs2
+TIME0_predictors.csv,PG.csv,X1vs3 KIF1B
+TIME0_predictors.csv,PG.csv,X1vs4
+TIME0_predictors.csv,PG.csv,X2vs3 ACP5 C3AR1
+TIME0_predictors.csv,PG.csv,X2vs4 IL18RAP RTP4
+TIME0_predictors.csv,PG.csv,X3vs4 RTP4
+TIME0_predictors.csv,PO.csv,H1N1 TNFAIP6 RTP4
+TIME0_predictors.csv,PO.csv,H3N2 TNFAIP6 TNFSF10 RTP4
+TIME0_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table2.processed.csv,original.symbol CXCL9
+TIME0_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table2.processed.csv,symbol ICAM1 CXCL9
+TIME0_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table2.processed.csv,gene_id
+TIME0_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table3.processed.csv,original.symbol
+TIME0_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table3.processed.csv,symbol
+TIME0_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table3.processed.csv,gene_id
+TIME0_predictors.csv,SHM.csv,Rhinovirus
+TIME0_predictors.csv,SHM.csv,RSV RTP4
+TIME0_predictors.csv,SHM.csv,Influenza TNFAIP6 RTP4
+TIME0_predictors.csv,SHM.csv,Panviral TNFAIP6 RTP4
+TIME0_predictors.csv,SHM.csv,Literature
+TIME0_predictors.csv,STM.csv,H3N2.H1N1 NLRP3 TNFAIP6 RTP4 NOD2
+TIME0_predictors.csv,Systems biology of vaccination for seasonal influenza in humans. - Sheet1.csv,Table.S6..Sets.of.2.4.genes.identified.by.DAMIP.model..first.analysis..as.predictors.of.HAI.response..
+TIME0_predictors.csv,Systems biology of vaccination for seasonal influenza in humans. - Sheet1.csv,Table.S8..Sets.of.genes.identified.by.DAMIP.model..second.analysis..as.predictors.of.HAI.response..
+TIME0_predictors.csv,Systems biology of vaccination for seasonal influenza in humans. - Sheet1.csv,Table.S9..Sets.of.genes.identified.by.DAMIP.model..third.analysis..as.predictors.of.HAI.response..
+TIME0_predictors.csv,TBE.csv,Single.Task RTP4
+TIME0_predictors.csv,TBE.csv,Multi.Task TNFRSF9 RTP4 EPB41L3
+TIME24_predictors.csv,Analysis of gene-expression profiles by oligonucleotide microarray in children with influenza.  - Sheet1.csv,Fig.1..acute.phase.influenza.virus.infection. IFIT2 IFIT1
+TIME24_predictors.csv,Analysis of gene-expression profiles by oligonucleotide microarray in children with influenza.  - Sheet1.csv,Table.1..febrile.convulsion.
+TIME24_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,A
+TIME24_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,B ARHGEF12 FECH CA1 EPB42 KLF1 OSBP2 SNCA TNS1 TSPAN5 XK
+TIME24_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,C
+TIME24_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,D IRF7 LAMP3 LAP3 RSAD2 HERC6 IFI44L IFIH1 IFIT1 IFIT3 MX1 TDRD7 USP18 IFI44 OAS3
+TIME24_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,E TNFAIP6 TNFSF10 RTP4 IFIT2
+TIME24_predictors.csv,A whole genome transcriptional analysis of the early immune response induced by live attenuated and inactivated influenza vaccines in young children. Table 2 (co-expression cluste.csv,F LY6E ISG15 OAS2 ZBP1 XAF1
+TIME24_predictors.csv,Bioinf.csv,WO.Baseline H1F0 ADM LY6E RSAD2 IFI27 IFI44L IFIT1 IFIT3 ISG15 MX1 IFI44
+TIME24_predictors.csv,Bioinf.csv,W.Baseline H1F0 RSAD2 IFI27 IFI44L ISG15 IFITM3
+TIME24_predictors.csv,BMC.csv,Combined CXCL10 LAMP3 LY6E IFIT2 LAP3 RSAD2 IFI44L IFIH1 IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 XAF1 IFITM3 OAS3
+TIME24_predictors.csv,DavenportEE_2015_JMolMed.FigS3.processed.csv,original.symbol CCL2 LAMP3 RTP4 OAS3
+TIME24_predictors.csv,DavenportEE_2015_JMolMed.FigS3.processed.csv,symbol CCL2 LAMP3 RTP4 OAS3
+TIME24_predictors.csv,DavenportEE_2015_JMolMed.FigS3.processed.csv,gene_id
+TIME24_predictors.csv,DavenportEE_2015_JMolMed.TableS3.processed.csv,original.symbol LPIN2 SIDT2 TOP1 ADM RIPK2 IRF7 CCL2 CXCL10 FFAR2 IFITM1 IL1B LAMP3 PLAUR TNFAIP6 HIF1A LDLR LY6E IRF1 TNFSF10 TAPBP OSM RTP4 CD38 DHX58 IFIT2 LGALS3BP P2RY14 SECTM1 LAP3 RSAD2 FCGR1A HERC6 IDO1 IFI44L IFIH1 IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 TDRD7 TRAFD1 USP18 ZBP1 ADAR PLSCR1 TRIM21 STAT2 XAF1 SOCS3 SOCS1 PML MT2A IFITM3 IFI44 HLA-A OAS3 MAFB ETS1
+TIME24_predictors.csv,DavenportEE_2015_JMolMed.TableS3.processed.csv,symbol LPIN2 SIDT2 TOP1 ADM RIPK2 IRF7 CCL2 CXCL10 FFAR2 IFITM1 IL1B LAMP3 PLAUR TNFAIP6 HIF1A LDLR LY6E IRF1 TNFSF10 TAPBP OSM RTP4 CD38 DHX58 IFIT2 LGALS3BP P2RY14 SECTM1 LAP3 RSAD2 FCGR1A HERC6 IDO1 IFI44L IFIH1 IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 TDRD7 TRAFD1 USP18 ZBP1 ADAR PLSCR1 TRIM21 STAT2 XAF1 SOCS3 SOCS1 PML MT2A IFITM3 IFI44 HLA-A OAS3 MAFB ETS1
+TIME24_predictors.csv,DavenportEE_2015_JMolMed.TableS3.processed.csv,gene_id
+TIME24_predictors.csv,JASA.csv,Principal.Response IRF7 LAMP3 TNFAIP6 LY6E TNFSF10 RTP4 IFIT2 LAP3 RSAD2 HERC6 IFI27 IFI44L IFIH1 IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 ZBP1 PLSCR1 XAF1 IFITM3 IFI44 OAS3
+TIME24_predictors.csv,JASA.csv,X IRF7 LAMP3 TNFAIP6 LY6E TNFSF10 RTP4 DHX58 IFIT2 LAP3 RSAD2 HERC6 IFI27 IFI44L IFIH1 IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 TDRD7 ZBP1 PLSCR1 XAF1 MT2A IFITM3 IFI44 OAS3
+TIME24_predictors.csv,JASA.csv,Secondary.Response CCL2 CXCL10 LAMP3 P2RY14 SOCS1
+TIME24_predictors.csv,JASA.csv,X.1 CCL2 CXCL10 LAMP3 DHX58 IFI27 IFIH1 TRAFD1 SOCS1
+TIME24_predictors.csv,JASA.csv,Gender.Factor ACP5 HBZ CLEC5A AKAP12 TMEM176B TMEM176A
+TIME24_predictors.csv,JASA.csv,X.2 HBZ IL18RAP IFIT1 TMEM158 TMEM176A PLVAP
+TIME24_predictors.csv,McClainMT_2016_OpenForumInfectDis.SupplementalTable2.processed.csv,original.symbol IRF7 CXCL10 LAMP3 TNFAIP6 LY6E TNFSF10 RTP4 IFIT2 LAP3 RSAD2 HERC6 IFI27 IFI44L IFIH1 IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 ZBP1 PLSCR1 XAF1 MT2A IFI44 OAS3
+TIME24_predictors.csv,McClainMT_2016_OpenForumInfectDis.SupplementalTable2.processed.csv,symbol IRF7 CXCL10 LAMP3 TNFAIP6 LY6E TNFSF10 RTP4 IFIT2 LAP3 RSAD2 HERC6 IFI27 IFI44L IFIH1 IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 ZBP1 PLSCR1 XAF1 MT2A IFI44 OAS3
+TIME24_predictors.csv,McClainMT_2016_OpenForumInfectDis.SupplementalTable2.processed.csv,gene_id
+TIME24_predictors.csv,MullerJ_2017_JTranslMed.TableS3.processed.csv,original.symbol CCL2 CXCL10 LAMP3 RSAD2 IFI27 IFI44L IFIT1 IFIT3 ISG15 SERPING1 USP18 IFI44 OAS3
+TIME24_predictors.csv,MullerJ_2017_JTranslMed.TableS3.processed.csv,symbol CCL2 CXCL10 LAMP3 RSAD2 IFI27 IFI44L IFIT1 IFIT3 ISG15 SERPING1 USP18 IFI44 OAS3
+TIME24_predictors.csv,MullerJ_2017_JTranslMed.TableS3.processed.csv,gene_id
+TIME24_predictors.csv,OF.csv,Current.Signature IRF7 CXCL10 LAMP3 TNFAIP6 LY6E TNFSF10 RTP4 IFIT2 LAP3 RSAD2 HERC6 IFI27 IFI44L IFIH1 IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 ZBP1 PLSCR1 XAF1 MT2A IFI44 OAS3
+TIME24_predictors.csv,PG.csv,X1vs2
+TIME24_predictors.csv,PG.csv,X1vs3
+TIME24_predictors.csv,PG.csv,X1vs4 IFI44L
+TIME24_predictors.csv,PG.csv,X2vs3 ACP5 LPAR1
+TIME24_predictors.csv,PG.csv,X2vs4 IL18RAP RTP4 IFI27
+TIME24_predictors.csv,PG.csv,X3vs4 RTP4 IFI44L
+TIME24_predictors.csv,PO.csv,H1N1 IRF7 CCL2 LAMP3 TNFAIP6 LY6E RTP4 DHX58 IFIT2 LAP3 RSAD2 HERC6 IFI27 IFI44L IFIH1 IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 TDRD7 ZBP1 PLSCR1 XAF1 IFITM3 IFI44 OAS3
+TIME24_predictors.csv,PO.csv,H3N2 IRF7 CCL2 CXCL10 LAMP3 TNFAIP6 LY6E TNFSF10 RTP4 IFIT2 LAP3 RSAD2 HERC6 IFI27 IFI44L IFIH1 IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 ZBP1 PLSCR1 XAF1 IFITM3 IFI44 OAS3
+TIME24_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table2.processed.csv,original.symbol IRF7 CCL2 CCL20 CXCL10 CXCL9 CXCL11 IFIT2 IFIT1 MX1 OAS2 PLSCR1 SOCS3 SOCS1 OAS3
+TIME24_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table2.processed.csv,symbol IRF7 CCL2 CCL20 CXCL10 CXCL9 CXCL11 IFIT2 RSAD2 IFIH1 IFIT1 IFIT3 ISG15 MX1 OAS2 PLSCR1 SOCS3 SOCS1 OAS3
+TIME24_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table2.processed.csv,gene_id
+TIME24_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table3.processed.csv,original.symbol
+TIME24_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table3.processed.csv,symbol
+TIME24_predictors.csv,ProudD_2008_AmJRespirCritCareMed.Table3.processed.csv,gene_id
+TIME24_predictors.csv,SHM.csv,Rhinovirus CCL2 CXCL10 LAMP3 LY6E IFIT2 RSAD2 IFI44L IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 XAF1 SOCS1 IFI44 OAS3
+TIME24_predictors.csv,SHM.csv,RSV LAMP3 RTP4 IFIT2 LAP3 RSAD2 FCGR1A IFI44L IFIT1 IFIT3 ISG15 MX1 SERPING1 IFI44 OAS3
+TIME24_predictors.csv,SHM.csv,Influenza CCL2 LAMP3 TNFAIP6 LY6E RTP4 RSAD2 IFI27 IFI44L IFIT1 IFIT3 ISG15 MX1 SERPING1 XAF1 IFI44 OAS3
+TIME24_predictors.csv,SHM.csv,Panviral LAMP3 TNFAIP6 LY6E RTP4 IFIT2 RSAD2 IFI27 IFI44L IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 XAF1 IFI44 OAS3
+TIME24_predictors.csv,SHM.csv,Literature CXCL10 LAMP3 LY6E DHX58 RSAD2 HERC6 IFI27 IFI44L IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 XAF1 PML IFI44 OAS3
+TIME24_predictors.csv,STM.csv,H3N2.H1N1 CCL2 LAMP3 NLRP3 TNFAIP6 LY6E RTP4 NOD2 IFIT2 RSAD2 IFI27 IFI44L IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 ADAR XAF1 SOCS1 OAS3
+TIME24_predictors.csv,Systems biology of vaccination for seasonal influenza in humans. - Sheet1.csv,Table.S6..Sets.of.2.4.genes.identified.by.DAMIP.model..first.analysis..as.predictors.of.HAI.response.. CD38 SECTM1
+TIME24_predictors.csv,Systems biology of vaccination for seasonal influenza in humans. - Sheet1.csv,Table.S8..Sets.of.genes.identified.by.DAMIP.model..second.analysis..as.predictors.of.HAI.response..
+TIME24_predictors.csv,Systems biology of vaccination for seasonal influenza in humans. - Sheet1.csv,Table.S9..Sets.of.genes.identified.by.DAMIP.model..third.analysis..as.predictors.of.HAI.response..
+TIME24_predictors.csv,TBE.csv,Single.Task IRF7 IFITM1 LY6E RTP4 LAP3 RSAD2 IFI27 IFI44L IFIT1 IFIT3 ISG15 MX1 OAS2 SERPING1 TDRD7 PLSCR1 XAF1 MT2A IFITM3 IFI44 OAS3
+TIME24_predictors.csv,TBE.csv,Multi.Task IRF7 IFITM1 LY6E RTP4 RSAD2 IFI27 IFI44L IFIT1 IFIT3 ISG15 MX1 OAS2 PLSCR1 XAF1 IFI44 OAS3 EPB41L3
