@@ -69,7 +69,7 @@ for(element in names(overlap_results)){
   intersection_list[[element]] <- c(element,getIntersection(gene_overlap))
 }
 bh_adj_p <- p.adjust(fisher_exact_p,method="BH")
-data.frame('RVD.Genelist,LIT.Genelist,LIT.col' = genelist_comparison,
+data.frame(Comparison = genelist_comparison,
            Num.Neither = contingency_table_notB_notA,
            Num.RVD.Only = contingency_table_notB_inA,
            Num.LIT.Only = contingency_table_inB_notA,
