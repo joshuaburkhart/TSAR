@@ -55,12 +55,12 @@ for(element1 in names(unique_rvd_data)){
 
 #create table
 genelist_comparison <- character()
+intersection_genes <- character()
 fisher_exact_p <- numeric()
 contingency_table_notB_notA <- numeric()
 contingency_table_notB_inA <- numeric()
 contingency_table_inB_notA <- numeric()
 contingency_table_inB_inA <- numeric()
-intersection_list <- list()
 for(element in names(overlap_results)){
   gene_overlap <- testGeneOverlap(overlap_results[[element]])
   cont_table <- getContbl(gene_overlap)
@@ -71,8 +71,7 @@ for(element in names(overlap_results)){
   contingency_table_notB_inA <- c(contingency_table_notB_inA, cont_table['notB','inA'])
   contingency_table_inB_notA <- c(contingency_table_inB_notA, cont_table['inB','notA'])
   contingency_table_inB_inA <- c(contingency_table_inB_inA, cont_table['inB','inA'])
-  
-  intersection_list[[element]] <- c(element,getIntersection(gene_overlap))
+  intersection_genes <- c(intersection_genes,paste(getIntersection(gene_overlap),collapse='|'))
 }
 
 # BH adjusted p
@@ -84,11 +83,7 @@ data.frame(Comparison = genelist_comparison,
            Num.RVD.Only = contingency_table_notB_inA,
            Num.LIT.Only = contingency_table_inB_notA,
            Num.Both = contingency_table_inB_inA,
+           Overlapping.Genes = intersection_genes,
            Fisher.Exact.P = fisher_exact_p,
            BH.Adj.P = bh_adj_p) %>%
   write.csv(file=OVERLAP_DATA_TABLE_FN, row.names = FALSE)
-
-# write gene intersection lists
-writeLines(unlist(lapply(intersection_list, paste, collapse=",")),con = OVERLAP_LISTS_FN)
-
-
