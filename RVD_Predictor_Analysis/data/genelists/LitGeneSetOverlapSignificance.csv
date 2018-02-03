@@ -34,60 +34,60 @@ TIME24 Union,"Chen M, et al. (2011a)",Gender Factor H1N1,12092,291,45,6,HBZ|IL18
 TIME0 Union,"Chen M, et al. (2011a)",Gender Factor H1N1,12131,252,46,5,ACP5|HBZ|CLEC5A|TMEM176A|TMEM176B,0.0039256472,0.3611595424
 TIME0 Union,"Chen M, et al. (2011a)",Secondary Response H1N1,12131,252,46,5,HBZ|IL18RAP|TMEM158|TMEM176A|PLVAP,0.0039256472,0.3611595424
 TIME24 Union,"Chen M, et al. (2011a)",Secondary Response H3N2,12091,292,46,5,CCL2|CXCL10|LAMP3|P2RY14|SOCS1,0.0071964439,0.6620728388
-TIME24 Union,"Huang Y, et al. (2011)",X3vs4,12132,295,5,2,RTP4|IFI44L,0.0110303993,1.0147967356
-TIME0 Union,"Huang Y, et al. (2011)",X2vs4,12170,255,7,2,IL18RAP|RTP4,0.0139201398,1.2806528616
-TIME0 Union,"Zaas AK, et al. (2013)",N/A,12134,253,43,4,NLRP3|TNFAIP6|RTP4|NOD2,0.015860671,1.459181732
-TIME0 Union,"Huang Y, et al. (2011)",X2vs3,12160,255,17,2,ACP5|C3AR1,0.0577721486,5.3150376712
-TIME24 Union,"Huang Y, et al. (2011)",X2vs3,12120,295,17,2,ACP5|LPAR1,0.0744751854,6.8517170568
-TIME0 Union,"McClain MT, et al. (2016)",Current.Signature,12130,254,47,3,TNFAIP6|TNFSF10|RTP4,0.0842471053,7.7507336876
-TIME0 Union,"Woods CW, et al. (2013)",H3N2,12130,254,47,3,TNFAIP6|TNFSF10|RTP4,0.0842471053,7.7507336876
-TIME0 Union,"Chen M, et al. (2011b)",Multi.Task,12130,254,47,3,TNFRSF9|RTP4|EPB41L3,0.0842471053,7.7507336876
-TIME0 Union,"Chen M, et al. (2011a)",Principal Response H1N1,12129,254,48,3,TNFAIP6|TNFSF10|RTP4,0.0882093467,8.1152598964
-TIME0 Union,"Zaas AK, et al. (2009)",Influenza,12154,255,23,2,TNFAIP6|RTP4,0.093578723,8.609242516
-TIME0 Union,"Huang Y, et al. (2011)",X1vs3,12173,256,4,1,KIF1B,0.0991762213,9.1242123596
-TIME0 Union,"Zaas AK, et al. (2009)",Panviral,12151,255,26,2,TNFAIP6|RTP4,0.1133336141,10.4266924972
-TIME24 Union,"Huang Y, et al. (2011)",X1vs4,12133,296,4,1,IFI44L,0.1138772322,10.4767053624
-TIME0 Union,"Davenport EE, et al. (2015)",Fig S3,12172,256,5,1,RTP4,0.1178029581,10.8378721452
-TIME0 Union,"Huang Y, et al. (2011)",X3vs4,12171,256,6,1,RTP4,0.1360460092,12.5162328464
-TIME0 Union,"Proud D, et al. (2008)",Table 2,12146,255,31,2,ICAM1|CXCL9,0.1482753781,13.6413347852
-TIME24 Union,"Kawada J, et al. (2006)",Fig.1..acute.phase.influenza.virus.infection.,12110,295,27,2,IFIT2|IFIT1,0.1518161113,13.9670822396
-TIME0 Union,"Liu T, et al. (2016)",WO.Baseline,12105,254,72,3,H1F0|ADM|MAP7,0.2022696456,18.6088073952
-TIME0 Union,"Woods CW, et al. (2013)",H1N1,12129,255,48,2,TNFAIP6|RTP4,0.2766721888,25.4538413696
-TIME0 Union,"Liu T, et al. (2016)",W.Baseline,12160,256,17,1,H1F0,0.3135370847,28.8454117924
-TIME0 Union,"Zaas AK, et al. (2009)",RSV,12152,256,25,1,RTP4,0.4193350566,38.5788252072
-TIME0 Union,"Proud D, et al. (2008)",Table 2,12145,256,32,1,CXCL9,0.4984875626,45.8608557592
-TIME0 Union,"Chen M, et al. (2011b)",Single.Task,12128,256,49,1,RTP4,0.6487901476,59.6886935792
-TIME24 Union,"Nakaya H, et al. (2011)",Table.S6..Sets.of.2.4.genes.identified.by.DAMIP.model..first.analysis..as.predictors.of.HAI.response..,12005,295,132,2,CD38|SECTM1,0.8338829917,76.7172352364
-TIME0 Union,"Davenport EE, et al. (2015)",Table S3,11332,243,845,14,TOP1|ADM|FFAR2|TNFAIP6|CDKN1A|LYN|TNFSF10|P2RX7|MEFV|OSM|RTP4|IL1B|MAFB|PLAUR,0.8563243301,78.7818383692
-TIME0 Union,"Kawada J, et al. (2006)",Fig.1..acute.phase.influenza.virus.infection.,12148,257,29,0,,1,92
-TIME0 Union,"Kawada J, et al. (2006)",Table.1..febrile.convulsion.,12149,257,28,0,,1,92
-TIME0 Union,"Zhu W, et al. (2010)",Cluster A,12167,257,10,0,,1,92
-TIME0 Union,"Zhu W, et al. (2010)",Cluster C,12124,257,53,0,,1,92
-TIME0 Union,"Zhu W, et al. (2010)",Cluster D,12150,257,27,0,,1,92
-TIME0 Union,"Zhu W, et al. (2010)",Cluster F,12166,257,11,0,,1,92
-TIME0 Union,"Chen B, et al. (2010)",Combined,12148,257,29,0,,1,92
-TIME0 Union,"Davenport EE, et al. (2015)",Fig S3,12171,257,6,0,,1,92
-TIME0 Union,"Davenport EE, et al. (2015)",Table S3,11318,257,859,0,,1,92
-TIME0 Union,"Chen M, et al. (2011a)",Secondary Response H3N2,12126,257,51,0,,1,92
-TIME0 Union,"Chen M, et al. (2011a)",Secondary Response H1N1,12126,257,51,0,,1,92
-TIME0 Union,"Muller J, et al. (2017)",N/A,12158,257,19,0,,1,92
-TIME0 Union,"Huang Y, et al. (2011)",X1vs2,12171,257,6,0,,1,92
-TIME0 Union,"Huang Y, et al. (2011)",X1vs4,12172,257,5,0,,1,92
-TIME0 Union,"Proud D, et al. (2008)",Table 2,12144,257,33,0,,1,92
-TIME0 Union,"Proud D, et al. (2008)",N/A,12157,257,20,0,,1,92
-TIME0 Union,"Zaas AK, et al. (2009)",Rhinovirus,12150,257,27,0,,1,92
-TIME0 Union,"Zaas AK, et al. (2009)",Literature,12149,257,28,0,,1,92
-TIME0 Union,"Nakaya H, et al. (2011)",Table.S6..Sets.of.2.4.genes.identified.by.DAMIP.model..first.analysis..as.predictors.of.HAI.response..,12043,257,134,0,,1,92
-TIME0 Union,"Nakaya H, et al. (2011)",Table.S8..Sets.of.genes.identified.by.DAMIP.model..second.analysis..as.predictors.of.HAI.response..,12145,257,32,0,,1,92
-TIME0 Union,"Nakaya H, et al. (2011)",Table.S9..Sets.of.genes.identified.by.DAMIP.model..third.analysis..as.predictors.of.HAI.response..,12152,257,25,0,,1,92
-TIME24 Union,"Kawada J, et al. (2006)",Table.1..febrile.convulsion.,12109,297,28,0,,1,92
-TIME24 Union,"Zhu W, et al. (2010)",Cluster A,12127,297,10,0,,1,92
-TIME24 Union,"Zhu W, et al. (2010)",Cluster C,12084,297,53,0,,1,92
-TIME24 Union,"Davenport EE, et al. (2015)",Fig S3,12131,297,6,0,,1,92
-TIME24 Union,"Davenport EE, et al. (2015)",Table S3,11278,297,859,0,,1,92
-TIME24 Union,"Huang Y, et al. (2011)",X1vs2,12131,297,6,0,,1,92
-TIME24 Union,"Huang Y, et al. (2011)",X1vs3,12132,297,5,0,,1,92
-TIME24 Union,"Proud D, et al. (2008)",Table 2,12104,297,33,0,,1,92
-TIME24 Union,"Proud D, et al. (2008)",N/A,12117,297,20,0,,1,92
-TIME24 Union,"Nakaya H, et al. (2011)",Table.S8..Sets.of.genes.identified.by.DAMIP.model..second.analysis..as.predictors.of.HAI.response..,12105,297,32,0,,1,92
-TIME24 Union,"Nakaya H, et al. (2011)",Table.S9..Sets.of.genes.identified.by.DAMIP.model..third.analysis..as.predictors.of.HAI.response..,12112,297,25,0,,1,92
+TIME24 Union,"Huang Y, et al. (2011)",X3vs4,12132,295,5,2,RTP4|IFI44L,0.0110303993,1
+TIME0 Union,"Huang Y, et al. (2011)",X2vs4,12170,255,7,2,IL18RAP|RTP4,0.0139201398,1
+TIME0 Union,"Zaas AK, et al. (2013)",N/A,12134,253,43,4,NLRP3|TNFAIP6|RTP4|NOD2,0.015860671,1
+TIME0 Union,"Huang Y, et al. (2011)",X2vs3,12160,255,17,2,ACP5|C3AR1,0.0577721486,1
+TIME24 Union,"Huang Y, et al. (2011)",X2vs3,12120,295,17,2,ACP5|LPAR1,0.0744751854,1
+TIME0 Union,"McClain MT, et al. (2016)",Current.Signature,12130,254,47,3,TNFAIP6|TNFSF10|RTP4,0.0842471053,1
+TIME0 Union,"Woods CW, et al. (2013)",H3N2,12130,254,47,3,TNFAIP6|TNFSF10|RTP4,0.0842471053,1
+TIME0 Union,"Chen M, et al. (2011b)",Multi.Task,12130,254,47,3,TNFRSF9|RTP4|EPB41L3,0.0842471053,1
+TIME0 Union,"Chen M, et al. (2011a)",Principal Response H1N1,12129,254,48,3,TNFAIP6|TNFSF10|RTP4,0.0882093467,1
+TIME0 Union,"Zaas AK, et al. (2009)",Influenza,12154,255,23,2,TNFAIP6|RTP4,0.093578723,1
+TIME0 Union,"Huang Y, et al. (2011)",X1vs3,12173,256,4,1,KIF1B,0.0991762213,1
+TIME0 Union,"Zaas AK, et al. (2009)",Panviral,12151,255,26,2,TNFAIP6|RTP4,0.1133336141,1
+TIME24 Union,"Huang Y, et al. (2011)",X1vs4,12133,296,4,1,IFI44L,0.1138772322,1
+TIME0 Union,"Davenport EE, et al. (2015)",Fig S3,12172,256,5,1,RTP4,0.1178029581,1
+TIME0 Union,"Huang Y, et al. (2011)",X3vs4,12171,256,6,1,RTP4,0.1360460092,1
+TIME0 Union,"Proud D, et al. (2008)",Table 2,12146,255,31,2,ICAM1|CXCL9,0.1482753781,1
+TIME24 Union,"Kawada J, et al. (2006)",Fig.1..acute.phase.influenza.virus.infection.,12110,295,27,2,IFIT2|IFIT1,0.1518161113,1
+TIME0 Union,"Liu T, et al. (2016)",WO.Baseline,12105,254,72,3,H1F0|ADM|MAP7,0.2022696456,1
+TIME0 Union,"Woods CW, et al. (2013)",H1N1,12129,255,48,2,TNFAIP6|RTP4,0.2766721888,1
+TIME0 Union,"Liu T, et al. (2016)",W.Baseline,12160,256,17,1,H1F0,0.3135370847,1
+TIME0 Union,"Zaas AK, et al. (2009)",RSV,12152,256,25,1,RTP4,0.4193350566,1
+TIME0 Union,"Proud D, et al. (2008)",Table 2,12145,256,32,1,CXCL9,0.4984875626,1
+TIME0 Union,"Chen M, et al. (2011b)",Single.Task,12128,256,49,1,RTP4,0.6487901476,1
+TIME24 Union,"Nakaya H, et al. (2011)",Table.S6..Sets.of.2.4.genes.identified.by.DAMIP.model..first.analysis..as.predictors.of.HAI.response..,12005,295,132,2,CD38|SECTM1,0.8338829917,1
+TIME0 Union,"Davenport EE, et al. (2015)",Table S3,11332,243,845,14,TOP1|ADM|FFAR2|TNFAIP6|CDKN1A|LYN|TNFSF10|P2RX7|MEFV|OSM|RTP4|IL1B|MAFB|PLAUR,0.8563243301,1
+TIME0 Union,"Kawada J, et al. (2006)",Fig.1..acute.phase.influenza.virus.infection.,12148,257,29,0,,1,1
+TIME0 Union,"Kawada J, et al. (2006)",Table.1..febrile.convulsion.,12149,257,28,0,,1,1
+TIME0 Union,"Zhu W, et al. (2010)",Cluster A,12167,257,10,0,,1,1
+TIME0 Union,"Zhu W, et al. (2010)",Cluster C,12124,257,53,0,,1,1
+TIME0 Union,"Zhu W, et al. (2010)",Cluster D,12150,257,27,0,,1,1
+TIME0 Union,"Zhu W, et al. (2010)",Cluster F,12166,257,11,0,,1,1
+TIME0 Union,"Chen B, et al. (2010)",Combined,12148,257,29,0,,1,1
+TIME0 Union,"Davenport EE, et al. (2015)",Fig S3,12171,257,6,0,,1,1
+TIME0 Union,"Davenport EE, et al. (2015)",Table S3,11318,257,859,0,,1,1
+TIME0 Union,"Chen M, et al. (2011a)",Secondary Response H3N2,12126,257,51,0,,1,1
+TIME0 Union,"Chen M, et al. (2011a)",Secondary Response H1N1,12126,257,51,0,,1,1
+TIME0 Union,"Muller J, et al. (2017)",N/A,12158,257,19,0,,1,1
+TIME0 Union,"Huang Y, et al. (2011)",X1vs2,12171,257,6,0,,1,1
+TIME0 Union,"Huang Y, et al. (2011)",X1vs4,12172,257,5,0,,1,1
+TIME0 Union,"Proud D, et al. (2008)",Table 2,12144,257,33,0,,1,1
+TIME0 Union,"Proud D, et al. (2008)",N/A,12157,257,20,0,,1,1
+TIME0 Union,"Zaas AK, et al. (2009)",Rhinovirus,12150,257,27,0,,1,1
+TIME0 Union,"Zaas AK, et al. (2009)",Literature,12149,257,28,0,,1,1
+TIME0 Union,"Nakaya H, et al. (2011)",Table.S6..Sets.of.2.4.genes.identified.by.DAMIP.model..first.analysis..as.predictors.of.HAI.response..,12043,257,134,0,,1,1
+TIME0 Union,"Nakaya H, et al. (2011)",Table.S8..Sets.of.genes.identified.by.DAMIP.model..second.analysis..as.predictors.of.HAI.response..,12145,257,32,0,,1,1
+TIME0 Union,"Nakaya H, et al. (2011)",Table.S9..Sets.of.genes.identified.by.DAMIP.model..third.analysis..as.predictors.of.HAI.response..,12152,257,25,0,,1,1
+TIME24 Union,"Kawada J, et al. (2006)",Table.1..febrile.convulsion.,12109,297,28,0,,1,1
+TIME24 Union,"Zhu W, et al. (2010)",Cluster A,12127,297,10,0,,1,1
+TIME24 Union,"Zhu W, et al. (2010)",Cluster C,12084,297,53,0,,1,1
+TIME24 Union,"Davenport EE, et al. (2015)",Fig S3,12131,297,6,0,,1,1
+TIME24 Union,"Davenport EE, et al. (2015)",Table S3,11278,297,859,0,,1,1
+TIME24 Union,"Huang Y, et al. (2011)",X1vs2,12131,297,6,0,,1,1
+TIME24 Union,"Huang Y, et al. (2011)",X1vs3,12132,297,5,0,,1,1
+TIME24 Union,"Proud D, et al. (2008)",Table 2,12104,297,33,0,,1,1
+TIME24 Union,"Proud D, et al. (2008)",N/A,12117,297,20,0,,1,1
+TIME24 Union,"Nakaya H, et al. (2011)",Table.S8..Sets.of.genes.identified.by.DAMIP.model..second.analysis..as.predictors.of.HAI.response..,12105,297,32,0,,1,1
+TIME24 Union,"Nakaya H, et al. (2011)",Table.S9..Sets.of.genes.identified.by.DAMIP.model..third.analysis..as.predictors.of.HAI.response..,12112,297,25,0,,1,1
