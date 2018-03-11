@@ -1,0 +1,66 @@
+
+R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # ---
+> # title: Download
+> # author: Joshua Burkhart
+> # date: Aug 10, 2017
+> # ---
+> 
+> # global variables
+> SYNAPSE_PARENT_ID <- "syn7067265"
+> SYNAPSE_QUERY <- paste("select * from file where file.parentId=='",SYNAPSE_PARENT_ID,"'",sep="")
+> DOWNLOAD_DIR <- "../data/downloads/"
+> MD5HASH_PATH <- paste(DOWNLOAD_DIR,"md5hash.txt",sep="")
+> CFG_PATH <- "../config/SynapseCredentials.dat"
+> 
+> if(!file.exists(MD5HASH_PATH)){
++   
++   # load library
++   library(synapseClient)
++   library(tools)
++   
++   # load credentials
++   credentials <- read.csv(CFG_PATH,stringsAsFactors = FALSE)
++   
++   # login to Synapse
++   synapseClient::synapseLogin(username = credentials$username, password =  credentials$password)
++   
++   # retrieve synapse IDs of all files of the parent synapse ID
++   fileDF <- synapseClient::synQuery(SYNAPSE_QUERY)
++   
++   # download files
++   lapply(fileDF$file.id, 
++          FUN = synapseClient::synGet, 
++          downloadLocation = DOWNLOAD_DIR)
++   
++   # get downloaded filenames
++   downloaded_csvs <- paste(DOWNLOAD_DIR,list.files(DOWNLOAD_DIR,pattern = "*.csv"),sep="")
++   
++   # calculate md5sum
++   md5hash <- tools::md5sum(downloaded_csvs)
++   
++   # store md5sum
++   write(md5hash,file = MD5HASH_PATH)
++   
++ }
+> 
+> proc.time()
+   user  system elapsed 
+  0.189   0.036   0.208 

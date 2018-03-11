@@ -1,0 +1,811 @@
+
+R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # ---
+> # title: Per Timepoint Analysis
+> # author: Joshua Burkhart
+> # date: Aug 20, 2017
+> # ---
+> 
+> # load libraries
+> library(SuperExactTest)
+Loading required package: grid
+
+Attaching package: ‘SuperExactTest’
+
+The following objects are masked from ‘package:base’:
+
+    intersect, union
+
+> library(org.Hs.eg.db)
+Loading required package: AnnotationDbi
+Loading required package: stats4
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following objects are masked from ‘package:SuperExactTest’:
+
+    intersect, union
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, append, as.data.frame, cbind, colMeans, colnames,
+    colSums, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+    grepl, intersect, is.unsorted, lapply, lengths, Map, mapply, match,
+    mget, order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which, which.max, which.min
+
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Loading required package: IRanges
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:base’:
+
+    expand.grid
+
+
+Warning message:
+package ‘AnnotationDbi’ was built under R version 3.4.1 
+> library(VennDiagram)
+Loading required package: futile.logger
+> library(hgu133a2.db)
+
+> library(ReactomePA)
+Loading required package: DOSE
+
+DOSE v3.2.0  For help: https://guangchuangyu.github.io/DOSE
+
+If you use DOSE in published research, please cite:
+Guangchuang Yu, Li-Gen Wang, Guang-Rong Yan, Qing-Yu He. DOSE: an R/Bioconductor package for Disease Ontology Semantic and Enrichment analysis. Bioinformatics 2015, 31(4):608-609
+
+ReactomePA v1.20.2  For help: https://guangchuangyu.github.io/ReactomePA
+
+If you use ReactomePA in published research, please cite:
+Guangchuang Yu, Qing-Yu He. ReactomePA: an R/Bioconductor package for reactome pathway analysis and visualization. Molecular BioSystems 2016, 12(2):477-479
+> library(annotate)
+Loading required package: XML
+Warning message:
+package ‘XML’ was built under R version 3.4.1 
+> library(magrittr)
+> library(ggplot2)
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following object is masked from ‘package:AnnotationDbi’:
+
+    select
+
+The following objects are masked from ‘package:IRanges’:
+
+    collapse, desc, intersect, setdiff, slice, union
+
+The following objects are masked from ‘package:S4Vectors’:
+
+    first, intersect, rename, setdiff, setequal, union
+
+The following object is masked from ‘package:Biobase’:
+
+    combine
+
+The following objects are masked from ‘package:BiocGenerics’:
+
+    combine, intersect, setdiff, union
+
+The following objects are masked from ‘package:SuperExactTest’:
+
+    intersect, union
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Warning message:
+package ‘dplyr’ was built under R version 3.4.2 
+> 
+> # helper functions
+> ReactomeBarplot <- function(query_gene_symbols,bar_color,plot_title){
++   
++   entrez_query <- AnnotationDbi::select(org.Hs.eg.db, query_gene_symbols, "ENTREZID", "SYMBOL")
++   
++   entrez_query <- entrez_query[!duplicated(entrez_query[,1]), 2]
++   
++   reactomeEnrich <- ReactomePA::enrichPathway(gene=unique(entrez_query),
++                                               organism = "human",
++                                               pvalueCutoff = 1.0,
++                                               pAdjustMethod = "BH",
++                                               qvalueCutoff = 1.0,
++                                               universe = ENTREZ_UNIVERSE,
++                                               minGSSize = 2,
++                                               maxGSSize = 1000,
++                                               readable = T)
++   reactomeEnrichAtLeast2GenesPerPathway <- reactomeEnrich %>% 
++     as.data.frame()
++   reactomeEnrichSummary <- reactomeEnrich %>% summary()
++   
++   qc_df <- data.frame(
++     Pathway=as.character(reactomeEnrichAtLeast2GenesPerPathway$Description),
++     log10.p.value=log10(reactomeEnrichAtLeast2GenesPerPathway$pvalue)
++   )
++   
++   qc_df %>% dplyr::slice(1:30) %>% ggplot(
++     aes(x=reorder(Pathway,-log10.p.value),y=-log10.p.value)) +
++     theme(legend.position="none") +
++     geom_bar(stat="identity", fill=bar_color) +
++     geom_text(position="stack",aes(label=round(-log10.p.value,digits=3),hjust=1.1)) +
++     coord_flip() +
++     labs(x="Reactome Pathway",y="-log10(p-value)",title=plot_title)
++ }
+> 
+> ## "an element is omitted if it is equal to any previous element"
+> ## https://stat.ethz.ch/R-manual/R-devel/library/base/html/unique.html
+> probeIDs2GeneNames <- function(df){
++   probeIDs <- df$Predictor
++   # remove X affixes
++   probeIDs <- sapply(na.omit(probeIDs),function(x) gsub("^X","", x))
++   probeIDs <- sapply(na.omit(probeIDs),function(x) gsub("_max$","",x))
++   geneNames <- toupper(unique(as.character(na.omit(annotate::lookUp(probeIDs, "hgu133a2.db", "SYMBOL")))))
++   return(data.frame(Predictor = geneNames))
++ }
+> 
+> unigeneIDs2GeneNames <- function(df){
++   unigeneIDs <- df$Predictor
++   # if many reported, keep first
++   unigeneIDs <- sapply(na.omit(unigeneIDs),function(x) gsub("^(Hs\\.[0-9]+).*","\\1",x))
++   probeIDs <- unique(as.character(na.omit(AnnotationDbi::mget(unigeneIDs, ifnotfound=NA,envir=AnnotationDbi::revmap(hgu133a2UNIGENE)))))
++   geneNames <- toupper(unique(as.character(na.omit(annotate::lookUp(probeIDs,"hgu133a2.db","SYMBOL")))))
++   return(data.frame(Predictor = geneNames))
++ }
+> 
+> 
+> # gloabal variables
+> P_VAL_THRESH = 0.005
+> 
+> ENTREZ_UNIVERSE <- AnnotationDbi::select(hgu133a2.db,keys=ls(hgu133a2ENTREZID),columns="ENTREZID") %>% .[,"ENTREZID"]
+'select()' returned 1:many mapping between keys and columns
+> ENTREZ_UNIVERSE <- ENTREZ_UNIVERSE[!duplicated(ENTREZ_UNIVERSE)]
+> 
+> DOWNLOAD_DIR <- "../../data/downloads/"
+> RESULTS_DIR <- "../../results/"
+> FIGURES_DIR <- paste(RESULTS_DIR,"Figs/",sep="")
+> GENELIST_DIR <- paste(RESULTS_DIR,"GeneLists/",sep="")
+> 
+> JD_S3_T0 <- paste(DOWNLOAD_DIR, "Subchallenge3_jdn_Time0_Predictors.csv",sep="")
+> JD_S3_T2 <- paste(DOWNLOAD_DIR, "Subchallenge3_jdn_Time24_Predictors.csv",sep="")
+> 
+> JD_T0_predictors <- read.csv(JD_S3_T0,header = TRUE) %>%
++   dplyr::transmute(Predictor = PREDICTOR) %>%
++   dplyr::select(Predictor) %>%
++   probeIDs2GeneNames()
+> 
+> JD_T2_predictors <- read.csv(JD_S3_T2,header = TRUE) %>%
++   dplyr::transmute(Predictor = PREDICTOR) %>%
++   dplyr::select(Predictor) %>%
++   probeIDs2GeneNames()
+> 
+> JH_S2_T0 <- paste(DOWNLOAD_DIR, "Subchallenge2_jhou_Time0_Predictors.csv",sep="")
+> JH_S2_T2 <- paste(DOWNLOAD_DIR, "Subchallenge2_jhou_Time24_Predictors.csv",sep="")
+> JH_S3_T0 <- paste(DOWNLOAD_DIR, "Subchallenge3_jhou_Time0_Predictors.csv",sep="")
+> JH_S3_T2 <- paste(DOWNLOAD_DIR, "Subchallenge3_jhou_Time24_Predictors.csv",sep="")
+> 
+> JH_T0_predictors <- read.csv(JH_S2_T0,header = TRUE,sep=",") %>%
++   dplyr::transmute(Predictor = X) %>%
++   dplyr::select(Predictor) %>%
++   probeIDs2GeneNames()
+> JH_T0_predictors <- read.csv(JH_S3_T0,header = TRUE,sep=",") %>%
++   dplyr::transmute(Predictor = X) %>%
++   dplyr::select(Predictor) %>%
++   probeIDs2GeneNames() %>%
++   rbind(JH_T0_predictors)
+> 
+> JH_T2_predictors <- read.csv(JH_S2_T2,header = TRUE,sep=",") %>%
++   dplyr::transmute(Predictor = X) %>%
++   dplyr::select(Predictor) %>%
++   probeIDs2GeneNames()
+> JH_T2_predictors <- read.csv(JH_S3_T2,header = TRUE,sep=",") %>%
++   dplyr::transmute(Predictor = X) %>%
++   dplyr::select(Predictor) %>%
++   probeIDs2GeneNames() %>%
++   rbind(JH_T2_predictors)
+> 
+> ER_S2_T0 <- paste(DOWNLOAD_DIR, "Subchallenge2_Espoir_Time0_Predictors.csv",sep="")
+> ER_S2_T2 <- paste(DOWNLOAD_DIR, "Subchallenge2_Espoir_Time24_Predictors.csv",sep="")
+>                  
+> ER_T0_predictors <- read.csv(ER_S2_T0,header=TRUE) %>%
++   dplyr::transmute(Predictor = FEATUREID) %>%
++   dplyr::select(Predictor) %>%
++   probeIDs2GeneNames()
+> 
+> ER_T2_predictors <- read.csv(ER_S2_T2,header=FALSE) %>%
++   dplyr::transmute(Predictor = V1) %>%
++   dplyr::select(Predictor) %>%
++   probeIDs2GeneNames()
+>  
+> BK_S3_T0 <- paste(DOWNLOAD_DIR, "Subchallenge3_burkhajo_Time0_Predictors.csv",sep="")
+> BK_S3_T2 <- paste(DOWNLOAD_DIR, "Subchallenge3_burkhajo_Time24_Predictors.csv",sep="")
+> 
+> BK_T0_predictors <- read.csv(BK_S3_T0, header = TRUE) %>%
++   dplyr::transmute(Predictor = PROBE) %>%
++   dplyr::select(Predictor) %>%
++   probeIDs2GeneNames()
+> BK_T2_predictors <- read.csv(BK_S3_T2, header = TRUE) %>%
++   dplyr::transmute(Predictor = PROBE) %>%
++   dplyr::select(Predictor) %>%
++   probeIDs2GeneNames()
+> 
+> AY_S2_T0 <- paste(DOWNLOAD_DIR,"Subchallenge2_aydin_Time0_Predictors.csv",sep="")
+> AY_S2_T2 <- paste(DOWNLOAD_DIR,"Subchallenge2_aydin_Time24_Predictors.csv",sep="")
+> AY_S3_T0 <- paste(DOWNLOAD_DIR,"Subchallenge3_aydin_Time0_Predictors.csv",sep="")
+> AY_S3_T2 <- paste(DOWNLOAD_DIR,"Subchallenge3_aydin_Time24_Predictors.csv",sep="")
+> 
+> AY_T0_predictors <- read.csv(AY_S2_T0,sep=",") %>%
++   dplyr::select(PROBE_SET_ID) %>%
++   dplyr::transmute(Predictor = PROBE_SET_ID) %>%
++   probeIDs2GeneNames()
+> AY_T0_predictors <- read.csv(AY_S3_T0,sep=",",header = FALSE) %>%
++   dplyr::select(V2) %>%
++   dplyr::transmute(Predictor = V2) %>%
++   probeIDs2GeneNames() %>%
++   rbind(AY_T0_predictors)
+> 
+> AY_T2_predictors <- read.csv(AY_S2_T2,sep=",") %>%
++   dplyr::select(PROBE_SET_ID) %>%
++   dplyr::transmute(Predictor = PROBE_SET_ID) %>%
++   probeIDs2GeneNames()
+> AY_T2_predictors <- read.csv(AY_S3_T2,sep=",",header = FALSE) %>%
++   dplyr::select(V2) %>%
++   dplyr::transmute(Predictor = V2) %>%
++   probeIDs2GeneNames() %>%
++   rbind(AY_T2_predictors)
+> 
+> SS_S2_T0 <- paste(DOWNLOAD_DIR,"Subchallenge2_SSN DREAM TEAM-0_Predictors.csv",sep="")
+> SS_S2_T2 <- paste(DOWNLOAD_DIR,"Subchallenge2_SSN DREAM TEAM-24_Predictors.csv",sep="")
+> SS_S3_T0 <- paste(DOWNLOAD_DIR,"Subchallenge3_SSN DREAM TEAM-0_Predictors.csv",sep="")
+> SS_S3_T2 <- paste(DOWNLOAD_DIR,"Subchallenge3_SSN DREAM TEAM-24_Predictors.csv",sep="")
+> 
+> SS_T0_predictors <- read.csv(SS_S2_T0,sep=",",header=FALSE) %>%
++   dplyr::select(V2) %>%
++   dplyr::transmute(Predictor = V2) %>%
++   probeIDs2GeneNames()
+> SS_T0_predictors <- read.csv(SS_S3_T0,sep=",",header=FALSE) %>%
++   dplyr::select(V2) %>%
++   dplyr::transmute(Predictor = V2) %>%
++   probeIDs2GeneNames() %>%
++   rbind(SS_T0_predictors)
+> 
+> SS_T2_predictors <- read.csv(SS_S2_T2,sep=",",header=FALSE) %>%
++   dplyr::select(V2) %>%
++   dplyr::transmute(Predictor = V2) %>%
++   probeIDs2GeneNames()
+> SS_T2_predictors <- read.csv(SS_S3_T2,sep=",",header=FALSE) %>%
++   dplyr::select(V2) %>%
++   dplyr::transmute(Predictor = V2) %>%
++   probeIDs2GeneNames() %>%
++   rbind(SS_T2_predictors)
+> 
+> CW_S2_T2 <- paste(DOWNLOAD_DIR,"Subchallenge2_cwruPatho_Time24_Predictors.csv",sep="")
+> CW_S3_T0 <- paste(DOWNLOAD_DIR,"Subchallenge3_cwruPatho_Time0_Predictors.csv",sep="")
+> CW_S3_T2 <- paste(DOWNLOAD_DIR,"Subchallenge3_cwruPatho_Time24_Predictors.csv",sep="")
+> 
+> CW_T0_predictors <- read.csv(CW_S3_T0,sep=",") %>%
++   dplyr::select(Probe.Set.ID) %>%
++   dplyr::transmute(Predictor = Probe.Set.ID) %>%
++   probeIDs2GeneNames()
+> 
+> CW_T2_predictors <- read.csv(CW_S2_T2,sep=",") %>%
++   dplyr::select(Probe.Set.ID) %>%
++   dplyr::transmute(Predictor = Probe.Set.ID) %>%
++   probeIDs2GeneNames()
+> CW_T2_predictors <- read.csv(CW_S3_T2,sep=",") %>%
++   dplyr::select(Probe.Set.ID) %>%
++   dplyr::transmute(Predictor = Probe.Set.ID) %>%
++   probeIDs2GeneNames() %>%
++   rbind(CW_T2_predictors)
+> 
+> # calculate support
+> 
+> AY_T0_predictors <- AY_T0_predictors[!duplicated(AY_T0_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> SS_T0_predictors <- SS_T0_predictors[!duplicated(SS_T0_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> CW_T0_predictors <- CW_T0_predictors[!duplicated(CW_T0_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> JD_T0_predictors <- JD_T0_predictors[!duplicated(JD_T0_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> ER_T0_predictors <- ER_T0_predictors[!duplicated(ER_T0_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> JH_T0_predictors <- JH_T0_predictors[!duplicated(JH_T0_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> BK_T0_predictors <- BK_T0_predictors[!duplicated(BK_T0_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> list.gene.sets <- c(
++                     AY_T0_predictors,
++                     SS_T0_predictors,
++                     CW_T0_predictors,
++                     ER_T0_predictors,
++                     JD_T0_predictors,
++                     JH_T0_predictors,
++                     BK_T0_predictors)
+> 
+> names(list.gene.sets) <- c(
++                            "AY",
++                            "SS",
++                            "CW",
++                            "ER",
++                            "JD",
++                            "JH",
++                            "BK")
+> 
+> # from https://cran.r-project.org/web/packages/SuperExactTest/vignettes/set_html.html
+> length.gene.sets <- sapply(list.gene.sets,
++                            FUN = length)
+> 
+> total=ENTREZ_UNIVERSE %>% length() # 24515
+> 
+> num.expected.overlap=total*do.call(base::prod,as.list(length.gene.sets/total))
+> 
+> sapply(0:min(length.gene.sets),function(i) SuperExactTest::dpsets(i, length.gene.sets, n=total))
+ [1] 9.999999e-01 1.142179e-07 5.672161e-15 1.607130e-22 2.862501e-30
+ [6] 3.323010e-38 2.513684e-46 1.194505e-54 3.234913e-63 3.803030e-72
+> 
+> res=SuperExactTest::supertest(list.gene.sets, n=total)
+> 
+> svg(filename=paste(FIGURES_DIR,"T0_Model_Intersections_(Spiral).svg",sep=""),
++     width=15,
++     height=15,
++     pointsize=12)
+> plot(res, sort.by="p-value")
+> dev.off()
+null device 
+          1 
+> 
+> svg(filename=paste(FIGURES_DIR,"T0_Model_Intersections_(Bar_Graph).svg",sep=""),
++     width=15,
++     height=15,
++     pointsize=12)
+> plot(res, Layout="landscape",degree=2:4, sort.by="p-value")
+> dev.off()
+null device 
+          1 
+> 
+> sigResDF <- summary(res)[["Table"]] %>%
++   as.data.frame() %>%
++   dplyr::filter(P.value < P_VAL_THRESH)
+> 
+> # end from https://cran.r-project.org/web/packages/SuperExactTest/vignettes/set_html.html
+> 
+> T0_predictors <- sigResDF %>%
++   dplyr::select(Elements) %>%
++   .[,] %>%
++   strsplit(.,split=", ") %>%
++   unlist() %>%
++   unique()
+> 
+> AY_T2_predictors <- AY_T2_predictors[!duplicated(AY_T2_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> SS_T2_predictors <- SS_T2_predictors[!duplicated(SS_T2_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> JD_T2_predictors <- JD_T2_predictors[!duplicated(JD_T2_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> CW_T2_predictors <- CW_T2_predictors[!duplicated(CW_T2_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> ER_T2_predictors <- ER_T2_predictors[!duplicated(ER_T2_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> JH_T2_predictors <- JH_T2_predictors[!duplicated(JH_T2_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> BK_T2_predictors <- BK_T2_predictors[!duplicated(BK_T2_predictors),] %>%
++   as.character() %>%
++   as.data.frame() %>%
++   dplyr::transmute_(Predictor = ".") %>%
++   dplyr::mutate(Predictor = as.character(Predictor)) %>%
++   dplyr::filter(Predictor != "NA")
+> 
+> list.gene.sets <- c(
++                     AY_T2_predictors,
++                     SS_T2_predictors,
++                     CW_T2_predictors,
++                     ER_T2_predictors,
++                     JD_T2_predictors,
++                     JH_T2_predictors,
++                     BK_T2_predictors)
+> 
+> names(list.gene.sets) <- c(
++                            "AY",
++                            "SS",
++                            "CW",
++                            "ER",
++                            "JD",
++                            "JH",
++                            "BK")
+> 
+> # from https://cran.r-project.org/web/packages/SuperExactTest/vignettes/set_html.html
+> length.gene.sets <- sapply(list.gene.sets,
++                            FUN = length)
+> 
+> total=ENTREZ_UNIVERSE %>% length() # 24515
+> 
+> num.expected.overlap=total*do.call(base::prod,as.list(length.gene.sets/total))
+> 
+> sapply(0:min(length.gene.sets),function(i) SuperExactTest::dpsets(i, length.gene.sets, n=total))
+[1] 1.000000e+00 1.141885e-08 5.602527e-17 1.542529e-25 2.606478e-34
+[6] 2.767645e-43 1.803295e-52 6.591271e-62 1.034659e-71
+> 
+> res=SuperExactTest::supertest(list.gene.sets, n=total)
+> 
+> svg(filename=paste(FIGURES_DIR,"T2_Model_Intersections_(Spiral).svg",sep=""),
++     width=15,
++     height=15,
++     pointsize=12)
+> plot(res, sort.by="p-value")
+> dev.off()
+null device 
+          1 
+> 
+> svg(filename=paste(FIGURES_DIR,"T2_Model_Intersections_(Bar_Graph).svg",sep=""),
++     width=15,
++     height=15,
++     pointsize=12)
+> plot(res, Layout="landscape",degree=2:4, sort.by="p-value")
+> dev.off()
+null device 
+          1 
+> 
+> sigResDF <- summary(res)[["Table"]] %>%
++   as.data.frame() %>%
++   dplyr::filter(P.value < P_VAL_THRESH)
+> 
+> # end from https://cran.r-project.org/web/packages/SuperExactTest/vignettes/set_html.html
+> 
+> T2_predictors <- sigResDF %>%
++   dplyr::select(Elements) %>%
++   .[,] %>%
++   strsplit(.,split=", ") %>%
++   unlist() %>%
++   unique()
+> 
+> # reactome pathway enrichment analysis
+> 
+> ## T0
+> title <- paste("T0 Predictors With p-value < ",P_VAL_THRESH,sep="")
+> T0_predictors %>%
++   write(paste(GENELIST_DIR,"T0_Predictors.txt",sep=""))
+> svg(filename=paste(FIGURES_DIR,"T0_Predictor_PA.svg",sep=""),
++     width=15,
++     height=15,
++     pointsize=12)
+> T0_predictors %>%
++   ReactomeBarplot(query_gene_symbols = .,
++                   bar_color = "lightskyblue",
++                   plot_title = title)
+'select()' returned 1:many mapping between keys and columns
+Warning message:
+In summary(.) :
+  summary method to convert the object to data.frame is deprecated, please use as.data.frame instead.
+> dev.off()
+null device 
+          1 
+> 
+> ## T2
+> title <- paste("T2 Predictors With p-value < ",P_VAL_THRESH,sep="")
+> T2_predictors %>%
++   write(paste(GENELIST_DIR,"T2_Predictors.txt",sep=""))
+> svg(filename=paste(FIGURES_DIR,"T2_Predictor_PA.svg",sep=""),
++     width=15,
++     height=15,
++     pointsize=12)
+> T2_predictors %>%
++   ReactomeBarplot(query_gene_symbols = .,
++                   bar_color = "midnightblue",
++                   plot_title = title)
+'select()' returned 1:many mapping between keys and columns
+Warning message:
+In summary(.) :
+  summary method to convert the object to data.frame is deprecated, please use as.data.frame instead.
+> dev.off()
+null device 
+          1 
+> 
+> # Intersections
+> 
+> T0_T2_predictors <- SuperExactTest::intersect(T0_predictors,
++                                                   T2_predictors)
+> T0_T2_predictors %>%
++   write(paste(GENELIST_DIR,"T0_T2_Intersection.txt",sep=""))
+> 
+> T0_Only <- dplyr::setdiff(T0_predictors,T2_predictors)
+> T0_Only %>%
++   write(paste(GENELIST_DIR,"T0_Only.txt",sep=""))
+> 
+> T2_Only <- dplyr::setdiff(T2_predictors,T0_predictors)
+> T2_Only %>%
++   write(paste(GENELIST_DIR,"T2_Only.txt",sep=""))
+> 
+> svg(filename=paste(FIGURES_DIR,"PerTimepointVennDiagram.svg",sep=""),
++     width=15,
++     height=15,
++     pointsize=12)
+> VennDiagram::draw.pairwise.venn(area1=length(T0_predictors),
++                               area2=length(T2_predictors),
++                               category = c("T0","T2"),
++                               cross.area=length(T0_T2_predictors),
++                               fill=c("lightskyblue","midnightblue"))
+(polygon[GRID.polygon.4159], polygon[GRID.polygon.4160], polygon[GRID.polygon.4161], polygon[GRID.polygon.4162], text[GRID.text.4163], text[GRID.text.4164], lines[GRID.lines.4165], text[GRID.text.4166], text[GRID.text.4167], text[GRID.text.4168]) 
+> dev.off()
+null device 
+          1 
+> 
+> ## T0 T2
+> svg(filename=paste(FIGURES_DIR,"T0_T2_Predictor_PA.svg",sep=""),
++     width=15,
++     height=15,
++     pointsize=12)
+> T0_T2_predictors %>%
++   ReactomeBarplot(query_gene_symbols = .,
++                   bar_color = "blue",
++                   plot_title = paste("T0 & T2 Predictors With p-value < ",P_VAL_THRESH))
+'select()' returned 1:many mapping between keys and columns
+Warning message:
+In summary(.) :
+  summary method to convert the object to data.frame is deprecated, please use as.data.frame instead.
+> dev.off()
+null device 
+          1 
+> 
+> 
+> ## T0 only
+> svg(filename=paste(FIGURES_DIR,"T0-Only_Predictor_PA.svg",sep=""),
++     width=15,
++     height=15,
++     pointsize=12)
+> T0_Only %>%
++   ReactomeBarplot(query_gene_symbols = .,
++                   bar_color = "lightskyblue",
++                   plot_title = paste("T0-Only Predictors with p-value < ",P_VAL_THRESH))
+'select()' returned 1:1 mapping between keys and columns
+Warning message:
+In summary(.) :
+  summary method to convert the object to data.frame is deprecated, please use as.data.frame instead.
+> dev.off()
+null device 
+          1 
+> 
+> ## T2 only
+> svg(filename=paste(FIGURES_DIR,"T2-Only_Predictor_PA.svg",sep=""),
++     width=15,
++     height=15,
++     pointsize=12)
+> T2_Only %>%
++   ReactomeBarplot(query_gene_symbols = .,
++                   bar_color = "midnightblue",
++                   plot_title = paste("T2-Only Predictors with p-value < ",P_VAL_THRESH))
+'select()' returned 1:1 mapping between keys and columns
+Warning message:
+In summary(.) :
+  summary method to convert the object to data.frame is deprecated, please use as.data.frame instead.
+> dev.off()
+null device 
+          1 
+> 
+> system_command = paste("qlmanage -t -s 1000 -o ", FIGURES_DIR, " ",FIGURES_DIR,"*.svg",sep="")
+> system(paste(system_command))
+2018-02-25 20:13:06.953 qlmanage[15272:917782] In -[NSApplication(NSQuietSafeQuit) _updateCanQuitQuietlyAndSafely], _LSSetApplicationInformationItem(NSCanQuitQuietlyAndSafely) returned error -50
+Testing Quick Look thumbnails with files:
+	../../results/Figs/H1N1-Only_Predictor_PA.svg
+	../../results/Figs/H1N1-Only_Predictor_PA_WithoutSC1.svg
+	../../results/Figs/H1N1_H3N2_Predictor_PA.svg
+	../../results/Figs/H1N1_H3N2_Predictor_PA_WithoutSC1.svg
+	../../results/Figs/H1N1_H3N2_Rhinovirus_Predictor_PA.svg
+	../../results/Figs/H1N1_H3N2_Rhinovirus_Predictor_PA_WithoutSC1.svg
+	../../results/Figs/H1N1_Model_Intersections_(Bar_Graph).svg
+	../../results/Figs/H1N1_Model_Intersections_(Bar_Graph)_WithoutSC1.svg
+	../../results/Figs/H1N1_Model_Intersections_(Spiral).svg
+	../../results/Figs/H1N1_Model_Intersections_(Spiral)_WithoutSC1.svg
+	../../results/Figs/H1N1_Predictor_PA.svg
+	../../results/Figs/H1N1_Predictor_PA_WithoutSC1.svg
+	../../results/Figs/H1N1_Rhinovirus_Predictor_PA.svg
+	../../results/Figs/H1N1_Rhinovirus_Predictor_PA_WithoutSC1.svg
+	../../results/Figs/H3N2-Only_Predictor_PA.svg
+	../../results/Figs/H3N2-Only_Predictor_PA_WithoutSC1.svg
+	../../results/Figs/H3N2_Model_Intersections_(Bar_Graph).svg
+	../../results/Figs/H3N2_Model_Intersections_(Bar_Graph)_WithoutSC1.svg
+	../../results/Figs/H3N2_Model_Intersections_(Spiral).svg
+	../../results/Figs/H3N2_Model_Intersections_(Spiral)_WithoutSC1.svg
+	../../results/Figs/H3N2_Predictor_PA.svg
+	../../results/Figs/H3N2_Predictor_PA_WithoutSC1.svg
+	../../results/Figs/H3N2_Rhinovirus_Predictor_PA.svg
+	../../results/Figs/H3N2_Rhinovirus_Predictor_PA_WithoutSC1.svg
+	../../results/Figs/PerStudyVennDiagram.svg
+	../../results/Figs/PerStudyVennDiagram_WithoutSC1.svg
+	../../results/Figs/PerSubchallengeVennDiagram.svg
+	../../results/Figs/PerTimepointVennDiagram.svg
+	../../results/Figs/Rhinovirus-Only_Predictor_PA.svg
+	../../results/Figs/Rhinovirus-Only_Predictor_PA_WithoutSC1.svg
+	../../results/Figs/Rhinovirus_Model_Intersections_(Bar_Graph).svg
+	../../results/Figs/Rhinovirus_Model_Intersections_(Bar_Graph)_WithoutSC1.svg
+	../../results/Figs/Rhinovirus_Model_Intersections_(Spiral).svg
+	../../results/Figs/Rhinovirus_Model_Intersections_(Spiral)_WithoutSC1.svg
+	../../results/Figs/Rhinovirus_Predictor_PA.svg
+	../../results/Figs/Rhinovirus_Predictor_PA_WithoutSC1.svg
+	../../results/Figs/S2-Only_Predictor_PA.svg
+	../../results/Figs/S2_Model_Intersections_(Bar_Graph).svg
+	../../results/Figs/S2_Model_Intersections_(Spiral).svg
+	../../results/Figs/S2_Predictor_PA.svg
+	../../results/Figs/S2_S3_Predictor_PA.svg
+	../../results/Figs/S3-Only_Predictor_PA.svg
+	../../results/Figs/S3_Model_Intersections_(Bar_Graph).svg
+	../../results/Figs/S3_Model_Intersections_(Spiral).svg
+	../../results/Figs/S3_Predictor_PA.svg
+	../../results/Figs/T0-Only_Predictor_PA.svg
+	../../results/Figs/T0_Model_Intersections_(Bar_Graph).svg
+	../../results/Figs/T0_Model_Intersections_(Spiral).svg
+	../../results/Figs/T0_Predictor_PA.svg
+	../../results/Figs/T0_T2_Predictor_PA.svg
+	../../results/Figs/T2-Only_Predictor_PA.svg
+	../../results/Figs/T2_Model_Intersections_(Bar_Graph).svg
+	../../results/Figs/T2_Model_Intersections_(Spiral).svg
+	../../results/Figs/T2_Predictor_PA.svg
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_H3N2_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1-Only_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1-Only_Predictor_PA_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_H3N2_Predictor_PA_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_H3N2_Rhinovirus_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_H3N2_Rhinovirus_Predictor_PA_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_Model_Intersections_(Bar_Graph)_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_Model_Intersections_(Bar_Graph).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_Model_Intersections_(Spiral).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_Model_Intersections_(Spiral)_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_Predictor_PA_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_Rhinovirus_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H1N1_Rhinovirus_Predictor_PA_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H3N2-Only_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H3N2_Model_Intersections_(Bar_Graph).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H3N2_Model_Intersections_(Bar_Graph)_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H3N2-Only_Predictor_PA_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H3N2_Model_Intersections_(Spiral).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H3N2_Model_Intersections_(Spiral)_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H3N2_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H3N2_Predictor_PA_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H3N2_Rhinovirus_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/H3N2_Rhinovirus_Predictor_PA_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/PerStudyVennDiagram.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/PerStudyVennDiagram_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/PerSubchallengeVennDiagram.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/Rhinovirus-Only_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/PerTimepointVennDiagram.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/Rhinovirus-Only_Predictor_PA_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/Rhinovirus_Model_Intersections_(Bar_Graph).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/Rhinovirus_Model_Intersections_(Bar_Graph)_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/Rhinovirus_Model_Intersections_(Spiral)_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/Rhinovirus_Model_Intersections_(Spiral).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/Rhinovirus_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/Rhinovirus_Predictor_PA_WithoutSC1.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/S2-Only_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/S2_Model_Intersections_(Bar_Graph).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/S2_Model_Intersections_(Spiral).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/S2_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/S3-Only_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/S2_S3_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/S3_Model_Intersections_(Spiral).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/S3_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/S3_Model_Intersections_(Bar_Graph).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/T0-Only_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/T0_Model_Intersections_(Bar_Graph).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/T0_Model_Intersections_(Spiral).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/T0_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/T0_T2_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/T2_Model_Intersections_(Bar_Graph).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/T2_Model_Intersections_(Spiral).svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/T2_Predictor_PA.svg produced one thumbnail
+* /Users/joshuaburkhart/SoftwareProjects/TSAR/RVD_Predictor_Analysis/results/Figs/T2-Only_Predictor_PA.svg produced one thumbnail
+Done producing thumbnails
+> 
+> proc.time()
+   user  system elapsed 
+ 83.595   7.982  92.665 

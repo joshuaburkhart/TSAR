@@ -76,8 +76,8 @@ P_VAL_THRESH = 0.005
 ENTREZ_UNIVERSE <- AnnotationDbi::select(hgu133a2.db,keys=ls(hgu133a2ENTREZID),columns="ENTREZID") %>% .[,"ENTREZID"]
 ENTREZ_UNIVERSE <- ENTREZ_UNIVERSE[!duplicated(ENTREZ_UNIVERSE)]
 
-DOWNLOAD_DIR <- "../data/downloads/"
-RESULTS_DIR <- "../results/"
+DOWNLOAD_DIR <- "../../data/downloads/"
+RESULTS_DIR <- "../../results/"
 FIGURES_DIR <- paste(RESULTS_DIR,"Figs/",sep="")
 GENELIST_DIR <- paste(RESULTS_DIR,"GeneLists/",sep="")
 
@@ -294,6 +294,12 @@ sapply(0:min(length.gene.sets),function(i) SuperExactTest::dpsets(i, length.gene
 
 res=SuperExactTest::supertest(list.gene.sets, n=total)
 
+res.sum <- summary(res)
+res.df <- res.sum$Table
+write.csv(res.df,file=paste(RESULTS_DIR,"T0_Intersections_Table.csv",sep=""),
+          sep=",",
+          row.names = FALSE)
+
 svg(filename=paste(FIGURES_DIR,"T0_Model_Intersections_(Spiral).svg",sep=""),
     width=15,
     height=15,
@@ -399,6 +405,12 @@ num.expected.overlap=total*do.call(base::prod,as.list(length.gene.sets/total))
 sapply(0:min(length.gene.sets),function(i) SuperExactTest::dpsets(i, length.gene.sets, n=total))
 
 res=SuperExactTest::supertest(list.gene.sets, n=total)
+
+res.sum <- summary(res)
+res.df <- res.sum$Table
+write.csv(res.df,file=paste(RESULTS_DIR,"T24_Intersections_Table.csv",sep=""),
+          sep=",",
+          row.names = FALSE)
 
 svg(filename=paste(FIGURES_DIR,"T2_Model_Intersections_(Spiral).svg",sep=""),
     width=15,
