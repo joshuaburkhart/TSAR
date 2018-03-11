@@ -5,7 +5,7 @@ library(hgu133a2.db)
 library(GeneOverlap)
 
 #globs
-SRC_DIR <- "/home/burkhart/Software/TSAR/RVD_Predictor_Analysis/"
+SRC_DIR <- "~/SoftwareProjects/TSAR/RVD_Predictor_Analysis/"
 DATA_DIR <- paste(SRC_DIR,"data/genelists/",sep="")
 OUT_DIR <- paste(SRC_DIR,"results/GeneLists/",sep="")
 RVD_DIR <- paste(DATA_DIR,"RVD/",sep="")
